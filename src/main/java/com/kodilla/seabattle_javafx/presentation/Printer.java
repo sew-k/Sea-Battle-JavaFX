@@ -67,6 +67,19 @@ public class Printer {
             }
         }
     }
+    public String printShipCountSettingsFx(Map<Integer,Integer> shipCountSettings) {
+        String message = "";
+        for (Map.Entry<Integer,Integer> entry : shipCountSettings.entrySet()) {
+            if (entry.getValue() != 0) {
+                String shipSize = "";
+                for (int i = 0; i < entry.getKey(); i++) {
+                    shipSize = shipSize + "[]";
+                }
+                message = message + ("Quantity of " + shipSize + " is: " + entry.getValue() + "\n");
+            }
+        }
+        return message;
+    }
 
     public void printShipSettingsToChange(int shipSize) {
         String shipSizeString = "";

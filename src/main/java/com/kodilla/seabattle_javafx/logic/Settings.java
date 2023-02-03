@@ -1,14 +1,17 @@
 package com.kodilla.seabattle_javafx.logic;
 
 import com.kodilla.seabattle_javafx.data.Board;
+import com.kodilla.seabattle_javafx.presentation.Drawer;
 import com.kodilla.seabattle_javafx.presentation.Keyboard;
 import com.kodilla.seabattle_javafx.presentation.Printer;
+import javafx.scene.control.Button;
+import javafx.stage.Stage;
 
 import java.util.*;
 
 public class Settings extends Options {
     private final String optionsTitle = "Game Settings";
-    private final List<String> settings = new ArrayList<>(Arrays.asList("Ships configuration", "Player settings", "Game board size", "Exit settings"));
+    private final List<String> options = new ArrayList<>(Arrays.asList("Ships configuration", "Player settings", "Game board size", "Exit settings"));
     private static Map<Integer,Integer> shipCountSettings;
     static {
         shipCountSettings = new HashMap<>();
@@ -47,7 +50,7 @@ public class Settings extends Options {
 
     @Override
     public List<String> getOptions() {
-        return settings;
+        return options;
     }
     @Override
     public String getOptionsTitle() {
@@ -83,6 +86,34 @@ public class Settings extends Options {
             result = false;
         }
         return result;
+    }
+    @Override
+    public void selectOptionFx(Button button, Stage primaryStage) {
+        Drawer drawer = new Drawer();
+        GameProcessor gameProcessor = new GameProcessor();
+        Settings settings = new Settings();
+        Menu menu = new Menu();
+
+        if (button.getText().equals(this.options.get(0))) {
+            //gameProcessor.startGameFx();
+
+        } else if (button.getText().equals(this.options.get(1))) {
+            try {
+                drawer.drawMenu(settings, primaryStage);
+            } catch (Exception e) {
+
+            }
+
+        } else if (button.getText().equals(this.options.get(2))) {
+            //drawer.drawScoreBoard();
+            //processor.processGame();
+        } else if (button.getText().equals(this.options.get(3))) {
+            try {
+                drawer.drawMenu(menu, primaryStage);
+            } catch (Exception e) {
+
+            }
+        }
     }
 
     @Override

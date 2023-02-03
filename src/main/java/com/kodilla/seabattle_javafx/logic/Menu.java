@@ -1,7 +1,11 @@
 package com.kodilla.seabattle_javafx.logic;
 
+import com.kodilla.seabattle_javafx.presentation.Drawer;
 import com.kodilla.seabattle_javafx.presentation.Keyboard;
 import com.kodilla.seabattle_javafx.presentation.Printer;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,6 +54,29 @@ public class Menu extends Options {
             } else {
                 printer.incorrectSelectionMessage();
             }
+        }
+    }
+    @Override
+    public void selectOptionFx(Button button, Stage primaryStage) {
+        Drawer drawer = new Drawer();
+        GameProcessor gameProcessor = new GameProcessor();
+        Settings settings = new Settings();
+
+        if (button.getText().equals(this.options.get(0))) {
+            gameProcessor.startGameFx(primaryStage);
+
+        } else if (button.getText().equals(this.options.get(1))) {
+            try {
+                drawer.drawMenu(settings, primaryStage);
+            } catch (Exception e) {
+
+            }
+
+        } else if (button.getText().equals(this.options.get(2))) {
+                        //drawer.drawScoreBoard();
+                        //processor.processGame();
+        } else if (button.getText().equals(this.options.get(3))) {
+            gameProcessor.exitGameFx(primaryStage);
         }
     }
 }

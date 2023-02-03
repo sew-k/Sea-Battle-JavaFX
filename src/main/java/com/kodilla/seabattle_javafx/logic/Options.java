@@ -1,5 +1,8 @@
 package com.kodilla.seabattle_javafx.logic;
 
+import javafx.scene.control.Button;
+import javafx.stage.Stage;
+
 import java.util.List;
 
 public abstract class Options {
@@ -16,6 +19,9 @@ public abstract class Options {
     }
 
     public void selectOption() {
+
+    }
+    public void selectOptionFx(Button button, Stage stage) {
 
     }
 

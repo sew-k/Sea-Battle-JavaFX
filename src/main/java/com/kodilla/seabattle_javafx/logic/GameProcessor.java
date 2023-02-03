@@ -1,23 +1,31 @@
 package com.kodilla.seabattle_javafx.logic;
 
 import com.kodilla.seabattle_javafx.data.*;
+import com.kodilla.seabattle_javafx.presentation.Drawer;
 import com.kodilla.seabattle_javafx.presentation.Keyboard;
 import com.kodilla.seabattle_javafx.presentation.Printer;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
 public class GameProcessor {
 
     private Player playerOne;
     private Player playerTwo;
-    private PlayerTurnOptions playerTurnOptions;
-    private Menu menu;
     private Printer printer;
     private Keyboard keyboard;
+
+    private Options menu = new Menu();
+    private Options settings = new Settings();
+    private Options playerSettings = new PlayerSettings();
+    private Options playerTurnOptions;
+    private Drawer drawer;
 
     public GameProcessor() {
         this.playerTurnOptions = new PlayerTurnOptions();
         this.menu = new Menu();
         this.printer = new Printer();
         this.keyboard = new Keyboard();
+        this.drawer = new Drawer();
     }
 
     public GameProcessor(Menu menu, Printer printer, Keyboard keyboard, PlayerTurnOptions playerTurnOptions) {
@@ -29,6 +37,9 @@ public class GameProcessor {
 
     public void exitGame() {
         printer.printExitGame();
+    }
+    public void exitGameFx(Stage primaryStage) {
+        primaryStage.close();
     }
 
     public Player getPlayerOneFromPlayerSettings(PlayerSettings playerSettings) {
@@ -76,6 +87,32 @@ public class GameProcessor {
             }
         }
     }
+    public void startGameFx(Stage primaryStage) {
+
+        PlayerSettings playerSettings = new PlayerSettings();
+
+        try {
+            drawer.boardDrawer(primaryStage);
+        } catch (Exception e) {
+
+        }
+
+        setPlayerOne(getPlayerOneFromPlayerSettings(playerSettings));
+        printer.askForSetShips(playerOne);
+        playerOne.shipsSetUp();
+
+        setPlayerTwo(getPlayerTwoFromPlayerSettings(playerSettings));
+        printer.askForSetShips(playerTwo);
+        playerTwo.shipsSetUp();
+
+        boolean battleEnd = false;
+        while (!battleEnd) {
+            if (!singleRoundProcessor(playerOne, playerTwo)) {
+                battleEnd = true;
+                processGame();
+            }
+        }
+    }
 
     public boolean singleRoundProcessor(Player playerOne, Player playerTwo) {
 
@@ -89,22 +126,22 @@ public class GameProcessor {
 
     public boolean singleTurnProcessor(Player currentPlayer, Player otherPlayer) {
 
-        if (currentPlayer.getName().equals("Computer")) {
-            singleShotProcessor(currentPlayer, otherPlayer);
-            if (winnerOfBattleCheck(currentPlayer, otherPlayer) != null) {
-                return false;
-            }
-        } else {
-            if (!playerTurnOptions.singleRoundSelectOption(currentPlayer, otherPlayer, this)) {
-                return false;
-            } else {
-                if (winnerOfBattleCheck(currentPlayer, otherPlayer) != null) {
-                    return false;
-                } else {
-                    return true;
-                }
-            }
-        }
+//        if (currentPlayer.getName().equals("Computer")) {
+//            singleShotProcessor(currentPlayer, otherPlayer);
+//            if (winnerOfBattleCheck(currentPlayer, otherPlayer) != null) {
+//                return false;
+//            }
+//        } else {
+//            if (!playerTurnOptions.singleRoundSelectOption(currentPlayer, otherPlayer, this)) {
+//                return false;
+//            } else {
+//                if (winnerOfBattleCheck(currentPlayer, otherPlayer) != null) {
+//                    return false;
+//                } else {
+//                    return true;
+//                }
+//            }
+//        }
         return true;
     }
 
@@ -169,6 +206,14 @@ public class GameProcessor {
         printer.titlePrinter();
         printer.optionsPrinter(menu);
         menu.selectOption();
+    }
+    public void processGameFX(Stage primaryStage) {
+        Drawer drawer = new Drawer();
+        try {
+            drawer.drawMenu(menu,primaryStage);
+        } catch (Exception e) {
+
+        }
     }
 
     public Player getPlayerOne() {
