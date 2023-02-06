@@ -15,10 +15,10 @@ public class Settings extends Options {
     private static Map<Integer,Integer> shipCountSettings;
     static {
         shipCountSettings = new HashMap<>();
-        shipCountSettings.put(4,1);
-        shipCountSettings.put(3,2);
-        shipCountSettings.put(2,3);
-        shipCountSettings.put(1,4);
+        shipCountSettings.put(4,0);
+        shipCountSettings.put(3,1);
+        shipCountSettings.put(2,0);
+        shipCountSettings.put(1,1);
     }
 
     private static boolean onePlayerGame = true;
