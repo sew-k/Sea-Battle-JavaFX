@@ -21,6 +21,21 @@ public class HumanPlayer extends Player {
     private boolean allShipsSet;
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+
+        HumanPlayer that = (HumanPlayer) o;
+
+        return name.equals(that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
+
+    @Override
     public boolean isAllShipsSet() {
         return allShipsSet;
     }
@@ -214,73 +229,7 @@ public class HumanPlayer extends Player {
                 return false;
             }
         }
-    @Override
-    public boolean tryFieldForShipsSetUp(String temporaryField) {
-//        System.out.println("trying field: " + temporaryField);
-//        Printer printer = new Printer();
-//        Map<Integer,Integer> shipCountSettings = Settings.getShipCountSettings();
-//
-//        setAvailableFieldsOnBoard();
-//        System.out.println(getAvailableFieldsOnBoard());
-//
-//        for (Map.Entry<Integer,Integer> entry : shipCountSettings.entrySet()) {
-//            for (int j=0; j< entry.getValue(); j++) {
-//                Ship ship = new Ship();
-//                ship.setSize(entry.getKey());
-//                Map<String,String> shipStatus = new HashMap<>();
-//
-//                printer.askForSetUpShip(ship);
-//
-//                boolean shipAdded = false;
-//                while (!shipAdded) {
-//                    for (int i = 0; i < entry.getKey(); i++) {    // iterate field of ship to set up
-//                        if (i == 0) {
-//                            printer.askForField(this);
-//                        } else if (i > 0) {
-//                            printer.askForNextField(this);
-//                        }
-//                        boolean correct = false;
-//                        while (!correct) {
-//                            List<String> availableFieldsForShipSetUp = new ArrayList<>();
-//                            availableFieldsForShipSetUp = getAvailableFieldsForShipSetUp(ship).stream()
-//                                    .filter(c -> getAvailableFieldsOnBoard().contains(c))
-//                                    .toList();
-//
-//                            printer.printAvailableFieldsForShipSetUp(availableFieldsForShipSetUp);
-//
-//                            shipStatus = ship.getStatusOnBoard();
-//
-//                            if (getAvailableFieldsForShipSetUp(ship).contains(temporaryField)) {
-//                                shipStatus.put(temporaryField, "good");
-//                                correct = true;
-//                                System.out.println("FIELD GOOOOD");
-//                                ship.setStatusOnBoard(shipStatus);
-//                                ship.setBufferZone();
-//
-//                                if (ship.getStatusOnBoard().size() == entry.getKey()) {
-//                                    addShip(ship);
-//                                    ship.setBufferZone();
-//                                    setAvailableFieldsOnBoard();
-//                                    shipAdded = true;
-//                                    printer.printShipAdded(ship);
-//                                    printer.playersBoardDrawer(this);
-//                                }
-//
-//                            } else if (!getAvailableFieldsForShipSetUp(ship).contains(temporaryField)) {
-//                                printer.incorrectSelectionMessage();
-//                                printer.askForField(this);
-//                                return false;
-//                            }
-//                        }
-//
-//                    }
-//
-//                }
-//
-//            }
-//        }
-        return true;
-    }
+
     @Override
     public void setCurrentShip(int currentShipSize) {
         currentShip = new Ship();

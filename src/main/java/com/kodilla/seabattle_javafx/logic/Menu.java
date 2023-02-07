@@ -22,40 +22,7 @@ public class Menu extends Options {
     public String getOptionsTitle() {
         return optionsTitle;
     }
-    @Override
-    public void selectOption() {
 
-        super.selectOption();
-        Settings settings = new Settings();
-        Keyboard keyboard = new Keyboard();
-        Validator validator = new Validator();
-        Printer printer = new Printer();
-        GameProcessor processor = new GameProcessor();
-        boolean incorrect = false;
-        printer.askForSelect();
-
-        while (!incorrect) {
-
-            String key = keyboard.getString();
-            if (validator.validateForOptions(key, this)) {
-                if (Integer.parseInt(key) == 0) {
-                    processor.startGame();
-                } else if (Integer.parseInt(key) == 1) {
-                    printer.optionsPrinter(settings);
-                    settings.selectOption();
-                } else if (Integer.parseInt(key) == 2) {
-                    printer.showScoreBoard();
-                    processor.processGame();
-                } else if (Integer.parseInt(key) == 3) {
-                    processor.exitGame();
-                    return;
-                }
-                return;
-            } else {
-                printer.incorrectSelectionMessage();
-            }
-        }
-    }
     @Override
     public void selectOptionFx(Button button, Stage primaryStage) {
         Drawer drawer = new Drawer();

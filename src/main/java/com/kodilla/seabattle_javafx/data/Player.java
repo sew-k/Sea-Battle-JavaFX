@@ -2,10 +2,7 @@ package com.kodilla.seabattle_javafx.data;
 
 import javafx.stage.Stage;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class Player {
@@ -16,6 +13,21 @@ public abstract class Player {
     private Set<String> availableFieldsOnBoard = new HashSet<>();
     private Ship currentShip;
     private boolean allShipsSet;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+
+        Player player = (Player) o;
+
+        return name.equals(player.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
 
     public boolean isAllShipsSet() {
         return allShipsSet;

@@ -4,8 +4,6 @@ import com.kodilla.seabattle_javafx.data.*;
 import com.kodilla.seabattle_javafx.presentation.Drawer;
 import com.kodilla.seabattle_javafx.presentation.Keyboard;
 import com.kodilla.seabattle_javafx.presentation.Printer;
-import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 public class GameProcessor {
@@ -16,12 +14,22 @@ public class GameProcessor {
     private Keyboard keyboard;
     public static boolean continueGame = true;
     public static Player currentPlayer;
+    public static Player waitingPlayer;
 
     private Options menu = new Menu();
     private Options settings = new Settings();
     private Options playerSettings = new PlayerSettings();
     private Options playerTurnOptions;
     private Drawer drawer;
+
+    public void setCurrentPlayerFx(Player player) {
+        currentPlayer = player;
+        if (currentPlayer.equals(playerOne)) {
+            waitingPlayer = playerTwo;
+        } else if (currentPlayer.equals(playerTwo)) {
+            waitingPlayer = playerOne;
+        }
+    }
 
     public GameProcessor() {
         this.playerTurnOptions = new PlayerTurnOptions();
@@ -38,106 +46,76 @@ public class GameProcessor {
         this.keyboard = keyboard;
     }
 
-    public void exitGame() {
-        printer.printExitGame();
-    }
     public void exitGameFx(Stage primaryStage) {
         primaryStage.close();
     }
-
-    public Player getPlayerOneFromPlayerSettings(PlayerSettings playerSettings) {
-        if ((PlayerSettings.getCurrentPlayerSettings() >= 0) && (PlayerSettings.getCurrentPlayerSettings() <= 2)) {
-            Player humanPlayer = new HumanPlayer();
-            printer.askForPlayerOneName();
-            humanPlayer.setName(keyboard.getString());
-            return humanPlayer;
-        } else if (PlayerSettings.getCurrentPlayerSettings() == 3) {
-            return new ComputerPlayer();
-        } else return null;
-    }
-
     public Player getPlayerOneFromPlayerSettingsFx(PlayerSettings playerSettings) {
 
         if ((PlayerSettings.getCurrentPlayerSettings() >= 0) && (PlayerSettings.getCurrentPlayerSettings() <= 2)) {
             Player humanPlayer = new HumanPlayer();
-
             return humanPlayer;
+
         } else if (PlayerSettings.getCurrentPlayerSettings() == 3) {
             return new ComputerPlayer();
+
         } else return null;
     }
     public Player getPlayerTwoFromPlayerSettingsFx(PlayerSettings playerSettings) {
+
         if (PlayerSettings.getCurrentPlayerSettings() == 2) {
             Player humanPlayer = new HumanPlayer();
-
             return humanPlayer;
+
         } else if ((PlayerSettings.getCurrentPlayerSettings() == 0) || (PlayerSettings.getCurrentPlayerSettings() == 3)) {
             return new ComputerPlayer();
+
         } else if (PlayerSettings.getCurrentPlayerSettings() == 1) {
             return new ComputerPlayer();   //temporarily. TODO - hard difficulty
+
         } else return null;
     }
-    public Player getPlayerTwoFromPlayerSettings(PlayerSettings playerSettings) {
-        if (PlayerSettings.getCurrentPlayerSettings() == 2) {
-            Player humanPlayer = new HumanPlayer();
-            printer.askForPlayerTwoName();
-            humanPlayer.setName(keyboard.getString());
-            return humanPlayer;
-        } else if ((PlayerSettings.getCurrentPlayerSettings() == 0) || (PlayerSettings.getCurrentPlayerSettings() == 3)) {
-            return new ComputerPlayer();
-        } else if (PlayerSettings.getCurrentPlayerSettings() == 1) {
-            return new ComputerPlayer();   //temporarily. TODO - hard difficulty
-        } else return null;
-    }
+    public void startGameFx(Stage primaryStage) {
 
-    public void startGame() {
+        if (checkIfPlayersSetFx()) {
+            setCurrentPlayerFx(playerOne);
+            System.out.println("checking is playerOne set as current: " + playerOne.equals(currentPlayer));
+            System.out.println("checking is playerTwo set as waiting: " + playerTwo.equals(waitingPlayer));
 
-        PlayerSettings playerSettings = new PlayerSettings();
-        printer.boardDrawer();
-
-        setPlayerOne(getPlayerOneFromPlayerSettings(playerSettings));
-        printer.askForSetShips(playerOne);
-        playerOne.shipsSetUp();
-
-        setPlayerTwo(getPlayerTwoFromPlayerSettings(playerSettings));
-        printer.askForSetShips(playerTwo);
-        playerTwo.shipsSetUp();
-
-        boolean battleEnd = false;
-        while (!battleEnd) {
-            if (!singleRoundProcessor(playerOne, playerTwo)) {
-                battleEnd = true;
-                processGame();
+            if (checkIfPlayersShipsAllSetFx()) {
+                processGameFx(primaryStage, playerOne, playerTwo);
             }
+
+        } else {
+            processGameFX(primaryStage);
         }
     }
-
-    public boolean checkIfPlayersSet() {
+    public boolean checkIfPlayersSetFx() {
         PlayerSettings playerSettings = new PlayerSettings();
         playerOne = getPlayerOneFromPlayerSettingsFx(playerSettings);
         playerTwo = getPlayerTwoFromPlayerSettingsFx(playerSettings);
         drawer.askAndSetPlayerName(playerOne, "ONE");
         drawer.askAndSetPlayerName(playerTwo, "TWO");
+
         if (playerOne.getName() != null && playerTwo.getName() != null && playerOne.getName() != "" && playerTwo.getName() != "") {
             return true;
         } else {
             return false;
         }
     }
-    public boolean checkIfPlayersShipsAllSet() {
 
-        currentPlayer = playerOne;
+    public boolean checkIfPlayersShipsAllSetFx() {
+        setCurrentPlayerFx(playerOne);
         Stage stage1 = new Stage();
         drawer.drawPlayerBoardForShipsSetUp(stage1, playerOne);
+
         if (playerOne.isAllShipsSet()) {
             stage1.close();
 
-            currentPlayer = playerTwo;
+            setCurrentPlayerFx(playerTwo);
             Stage stage2 = new Stage();
             drawer.drawPlayerBoardForShipsSetUp(stage2, playerTwo);
             if (playerTwo.isAllShipsSet()) {
                 stage2.close();
-
             }
         }
 
@@ -149,85 +127,51 @@ public class GameProcessor {
             return false;
         }
     }
-    public void startGameFx(Stage primaryStage) {
-
-        if (checkIfPlayersSet()) {
-
-            currentPlayer = playerOne;
-
-
-            if (checkIfPlayersShipsAllSet()) {
-
-                boolean battleEnd = false;
-                while (!battleEnd) {
-                    if (!singleRoundProcessorFx(playerOne, playerTwo)) {
-                        battleEnd = true;
-                        processGameFX(primaryStage);
-                    }
-                }
+    public void processGameFx(Stage primaryStage, Player playerOne, Player playerTwo) {
+        boolean battleEnd = false;
+        while (!battleEnd) {
+            if (!singleRoundProcessorFx(primaryStage, playerOne, playerTwo)) {
+                battleEnd = true;
+                processGameFX(primaryStage);
             }
+        }
+    }
 
+    public boolean singleRoundProcessorFx(Stage primaryStage, Player playerOne, Player playerTwo) {
+        if (continueGame) {
+            setCurrentPlayerFx(playerOne);
+            singleTurnProcessorFx(primaryStage, currentPlayer, waitingPlayer);
+            if (continueGame) {
+                setCurrentPlayerFx(playerTwo);
+                singleTurnProcessorFx(primaryStage, currentPlayer, waitingPlayer);
+            } else {
+                return false;
+            }
+            return true;
         } else {
-            processGameFX(primaryStage);
-        }
-
-    }
-
-    public boolean singleRoundProcessor(Player playerOne, Player playerTwo) {
-
-        if (!(singleTurnProcessor(playerOne, playerTwo))) {
-            return false;
-        } else if (!(singleTurnProcessor(playerTwo, playerOne))) {
             return false;
         }
-        return true;
     }
 
-    public boolean singleRoundProcessorFx(Player playerOne, Player playerTwo) {
 
-        if (!(singleTurnProcessorFx(playerOne, playerTwo))) {
-            return false;
-        } else if (!(singleTurnProcessorFx(playerTwo, playerOne))) {
-            return false;
-        }
-        return true;
-    }
+    public boolean singleTurnProcessorFx(Stage primaryStage, Player currentPlayer, Player otherPlayer) {
 
-    public boolean singleTurnProcessor(Player currentPlayer, Player otherPlayer) {
+        System.out.println("processing turn for player " + currentPlayer.getName());
 
-//        if (currentPlayer.getName().equals("Computer")) {
-//            singleShotProcessor(currentPlayer, otherPlayer);
-//            if (winnerOfBattleCheck(currentPlayer, otherPlayer) != null) {
-//                return false;
-//            }
-//        } else {
-//            if (!playerTurnOptions.singleRoundSelectOption(currentPlayer, otherPlayer, this)) {
-//                return false;
-//            } else {
-//                if (winnerOfBattleCheck(currentPlayer, otherPlayer) != null) {
-//                    return false;
-//                } else {
-//                    return true;
-//                }
-//            }
-//        }
-        return true;
-    }
-    public boolean singleTurnProcessorFx(Player currentPlayer, Player otherPlayer) {
-
-        if (currentPlayer.getName().equals("Computer")) {
+        if (currentPlayer.getName().equals("Computer")) {                   //TODO: ComputerPlayer not ready yet
             singleShotProcessor(currentPlayer, otherPlayer);
             if (winnerOfBattleCheck(currentPlayer, otherPlayer) != null) {
                 return false;
             }
         } else {
-            //singleShotProcessorFx(currentPlayer, otherPlayer);
-            drawer.drawBoardForPlayerTurn(currentPlayer, otherPlayer);
+            drawer.drawGetReadyWindowForPlayer(currentPlayer);
+            //drawer.drawBoardForPlayerTurn(getPlayerOne(), getPlayerTwo());
             if (winnerOfBattleCheck(currentPlayer, otherPlayer) != null) {
+                continueGame = false;
                 return false;
             }
         }
-        return true;
+        return false;
     }
 
     public void singleShotProcessor(Player attacker, Player defender) {
@@ -263,10 +207,18 @@ public class GameProcessor {
             if (winner.equals(attacker)) {
                 loser = defender;
             }
-
             printer.playersBoardDrawer(loser);
             playerWinGame(winner);
+        } else {
+            if (currentPlayer.equals(playerOne)) {
+                currentPlayer = playerTwo;
+                System.out.println("changed current player to player two");
+            } else if (currentPlayer.equals(playerTwo)) {
+                currentPlayer = playerOne;
+                System.out.println("changed current player to player one");
+            }
         }
+
     }
 
     public void singleShotProcessorFx(Player attacker, Player defender, String target) {
@@ -299,6 +251,25 @@ public class GameProcessor {
 
             printer.playersBoardDrawer(loser);
             playerWinGame(winner);
+        } else {
+            endPlayerTurnFx(currentPlayer);
+//            if (currentPlayer.equals(playerOne)) {
+//                currentPlayer = playerTwo;
+//                System.out.println("changed current player to player two");
+//            } else if (currentPlayer.equals(playerTwo)) {
+//                currentPlayer = playerOne;
+//                System.out.println("changed current player to player one");
+//            }
+        }
+    }
+
+    public void endPlayerTurnFx(Player currentPlayer) {
+        if (currentPlayer.equals(playerOne)) {
+            setCurrentPlayerFx(playerTwo);
+            System.out.println("changed current player to player two");
+        } else if (currentPlayer.equals(playerTwo)) {
+            setCurrentPlayerFx(playerOne);
+            System.out.println("changed current player to player one");
         }
     }
 
