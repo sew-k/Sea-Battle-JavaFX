@@ -36,9 +36,9 @@ public class Drawer {
     }
 
     public Scene drawMenu(Options options, Stage primaryStage) throws IOException {
-        FileInputStream fileInputStream = new FileInputStream("C:/dev/kodilla-course/SeaBattle_JavaFX/build/resources/SeaBattleImage.jpg");
+        //FileInputStream fileInputStream = new FileInputStream("SeaBattleImage.jpg");
         VBox root = new VBox();
-        Image image = new Image(fileInputStream);
+        Image image = new Image("SeaBattleImage.jpg");
         ImageView imageView = new ImageView(image);
         imageView.setFitWidth(320);
         imageView.setPreserveRatio(true);
