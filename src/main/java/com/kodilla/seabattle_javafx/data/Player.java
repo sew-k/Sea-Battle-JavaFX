@@ -6,7 +6,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class Player {
-    private String name;
+    public String name;
     private List<Ship> ships;
     public int score;
     private Set<String> shots = new HashSet<>();
@@ -14,20 +14,20 @@ public abstract class Player {
     private Ship currentShip;
     private boolean allShipsSet;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null) return false;
-
-        Player player = (Player) o;
-
-        return name.equals(player.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
-    }
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null) return false;
+//
+//        Player player = (Player) o;
+//
+//        return name.equals(player.name);
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(name);
+//    }
 
     public boolean isAllShipsSet() {
         return allShipsSet;

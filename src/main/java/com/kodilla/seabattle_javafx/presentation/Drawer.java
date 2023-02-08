@@ -2,13 +2,13 @@ package com.kodilla.seabattle_javafx.presentation;
 
 import com.kodilla.seabattle_javafx.data.*;
 import com.kodilla.seabattle_javafx.logic.*;
+import com.kodilla.seabattle_javafx.logic.Menu;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -17,8 +17,7 @@ import javafx.stage.Stage;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Drawer {
 
@@ -97,11 +96,17 @@ public class Drawer {
 
                         if (GameProcessor.currentPlayer.tryFieldForShipSetUp(fieldBt.getText(), GameProcessor.currentPlayer.getCurrentShip())) {
                             fieldBt.setVisible(false);
+
+//                            if () {
+//
+//                            }
+
                             if (GameProcessor.currentPlayer.isAllShipsSet()) {
                                 primaryStage.close();
                             }
                         } else {
                             System.out.println("FIELD NOT AVAILABLE");
+
                         }
                     }
                 });
@@ -123,10 +128,10 @@ public class Drawer {
         message = " - please, select ship to set on board";
         GridPane gridPaneShips = new GridPane();
         Player currentPlayer = GameProcessor.currentPlayer;
-        Map<Integer,Integer> shipCountSettings = currentPlayer.getShipsToSet();
+
         int i = 0;
 
-        for (Map.Entry<Integer,Integer> entry : shipCountSettings.entrySet()) {
+        for (Map.Entry<Integer,Integer> entry : currentPlayer.getShipsToSet().entrySet()) {
             Button buttonAsShip = new Button();
             buttonAsShip.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
@@ -299,13 +304,16 @@ public class Drawer {
     }
     public Label setLabelFieldForAttackerPlayerBoard(Player attacker, String fieldLabelCoordinates) {
         Label fieldLabel = new Label();
+        String isFieldAnyShipStatus = " ";
 
         for (String shot : GameProcessor.waitingPlayer.getShots()) {
             if (shot.equals(fieldLabelCoordinates)) {
-                fieldLabel.setText("x");
+                isFieldAnyShipStatus = "x";
+                if (attacker.equals(GameProcessor.waitingPlayer)) {
+                    isFieldAnyShipStatus = " ";
+                }
             }
         }
-        String isFieldAnyShipStatus = " ";
 
         for (Ship ship : attacker.getShips()) {
             for (Map.Entry<String,String> entry : ship.getStatusOnBoard().entrySet()) {
@@ -315,6 +323,7 @@ public class Drawer {
             }
         }
         fieldLabel.setText(isFieldAnyShipStatus.toUpperCase());
+        fieldLabel.setAlignment(Pos.CENTER);
 
         if (isFieldAnyShipStatus.equals("good")) {
             fieldLabel.setTextFill(Color.GREEN);
@@ -433,5 +442,112 @@ public class Drawer {
     }
     public void drawPlayerWinGame(Player winner) {
 
+    }
+    public void drawSettings() {
+        Settings settings = new Settings();
+        Label titleSettingsLabel = new Label(settings.getOptionsTitle());
+        List<String> settingsList = new ArrayList<>(settings.getOptions());
+
+        PlayerSettings playerSettings = new PlayerSettings();
+        Label titlePlayerSettingsLabel = new Label(playerSettings.getOptionsTitle());
+        List<String> playerSettingsList = new ArrayList<>(playerSettings.getOptions());
+
+        Board.getColumnsCount();
+        Board.getRowsCount();
+
+        Stage stage = new Stage();
+
+        Label playerSettingsLabel = new Label(settings.getOptions().get(1));
+        playerSettingsLabel.setStyle("-fx-font-weight: bold;");
+        RadioButton pVsCn = new RadioButton(playerSettings.getOptions().get(0));
+        RadioButton pVsCh = new RadioButton(playerSettings.getOptions().get(1));
+        pVsCh.setDisable(true);
+        RadioButton pVsp = new RadioButton(playerSettings.getOptions().get(2));
+        RadioButton cVsC = new RadioButton(playerSettings.getOptions().get(3));
+        VBox playerSettingsVBox = new VBox(playerSettingsLabel, pVsCn, pVsCh, pVsp, cVsC);
+        playerSettingsVBox.setStyle("-fx-border-color: grey;");
+
+        Label shipCountSettingsLabel = new Label(settings.getOptions().get(0));
+        shipCountSettingsLabel.setStyle("-fx-font-weight: bold;");
+        Map<Integer, Integer> shipCountSettings = Settings.getShipCountSettings();
+        BorderPane shipCountSettingsBorderPane = new BorderPane();
+        GridPane gridPaneShips = new GridPane();
+
+        Map<Integer,Integer> temporaryShipCountSettings = Settings.getShipCountSettings();
+
+
+        List<TextField> textFieldList = new ArrayList<>();
+        int i = 0;
+        for (Map.Entry<Integer,Integer> entry : temporaryShipCountSettings.entrySet()) {
+            Label labelAsShip = new Label();
+            double labelAsShipWidth = 20;
+            double labelAsShipHeight = 20;
+            double currentLabelAsShipWidth = labelAsShipWidth * entry.getKey();
+            labelAsShip.setMinSize(currentLabelAsShipWidth, labelAsShipHeight);
+            labelAsShip.setStyle("-fx-background-color: white;");
+            labelAsShip.setStyle("-fx-border-color: grey");
+
+            TextField textField = new TextField(Integer.toString(entry.getValue()));
+            textField.setAccessibleText(Integer.toString(entry.getValue()));
+            entry.setValue(Integer.parseInt(textField.getAccessibleText()));
+            textField.setId(Integer.toString(entry.getKey()));
+            textField.setMaxSize(30,20);
+            textFieldList.add(i, textField);
+            gridPaneShips.add(labelAsShip,0, i);
+            Label shipsToSet = new Label(" - current number: ");
+            gridPaneShips.add(shipsToSet,1 , i);
+            gridPaneShips.add(textFieldList.get(i),2 , i);
+            i++;
+        }
+        shipCountSettingsBorderPane.setTop(shipCountSettingsLabel);
+        shipCountSettingsBorderPane.setCenter(gridPaneShips);
+        shipCountSettingsBorderPane.setStyle("-fx-border-color: grey;");
+
+        Label boardSizeLabel = new Label(settings.getOptions().get(2));
+        boardSizeLabel.setStyle("-fx-font-weight: bold;");
+        TextField heightTextField = new TextField(Integer.toString(Board.getRowsCount()));
+        TextField widthTextField = new TextField(Integer.toString(Board.getColumnsCount()));
+        heightTextField.setMinSize(40,20);
+        heightTextField.setMaxSize(40,20);
+        widthTextField.setMinSize(40,20);
+        widthTextField.setMaxSize(40,20);
+        HBox boardHeightHBox = new HBox(new Label("Height: "), heightTextField);
+        HBox boardWidthHBox = new HBox(new Label("Width: "), widthTextField);
+        VBox boardSizeVBox = new VBox(boardSizeLabel, boardHeightHBox, boardWidthHBox);
+        boardSizeVBox.setStyle("-fx-border-color: grey;");
+
+        Button acceptButton = new Button("Accept & Save");
+        acceptButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                Board.setRowsCount(Integer.parseInt(heightTextField.getText()));
+                System.out.println("Board size height set to: " + Board.getRowsCount());
+                Board.setColumnsCount(Integer.parseInt(widthTextField.getText()));
+                System.out.println("Board size width set to: " + Board.getColumnsCount());
+                for (int j=0; j < textFieldList.size(); j++) {
+                    temporaryShipCountSettings.replace(Integer.parseInt(textFieldList.get(j).getId()), Integer.parseInt(textFieldList.get(j).getText()));
+                }
+                Settings.setShipCountSettings(temporaryShipCountSettings);
+
+                stage.close();
+            }
+        });
+        Button cancelButton = new Button("Cancel");
+        cancelButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                stage.close();
+            }
+        });
+        HBox buttonsHBox = new HBox(acceptButton, cancelButton);
+        buttonsHBox.setAlignment(Pos.CENTER);
+        buttonsHBox.setStyle("-fx-border-color: grey;");
+        VBox vBox = new VBox();
+        vBox.setSpacing(10);
+        vBox.getChildren().addAll(playerSettingsVBox, shipCountSettingsBorderPane, boardSizeVBox, buttonsHBox);
+        vBox.setAlignment(Pos.CENTER);
+        Scene scene = new Scene(vBox);
+        stage.setScene(scene);
+        stage.showAndWait();
     }
 }

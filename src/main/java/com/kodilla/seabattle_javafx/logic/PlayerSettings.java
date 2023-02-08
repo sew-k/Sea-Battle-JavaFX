@@ -9,11 +9,12 @@ import java.util.List;
 
 public class PlayerSettings extends Options {
     private final String optionsTitle = "Player Settings";
-    private final List<String> playerSettings = new ArrayList<>(Arrays.asList("Player vs Computer (normal)",
+    private final List<String> playerSettings = new ArrayList<>(Arrays.asList(
+            "Player vs Computer (normal)",
             "Player vs Computer (hard)",             //TODO - implementation of hard-version of ComputerPlayer
-            "Player vs Player",
+            "Player vs Player (hot seat)",
             "Computer vs Computer"));                //TODO - implementation different names or numerators for both Cpu-players
-    private static int currentPlayerSettings = 2;
+    private static int currentPlayerSettings = 0;
 
     @Override
     public String getOptionsTitle() {

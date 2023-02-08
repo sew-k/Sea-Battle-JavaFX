@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class HumanPlayer extends Player {
 
-    private String name;
+    //private String name;
     private List<Ship> ships = new ArrayList<>();
     private Set<String> shots = new HashSet<>();
     private Set<String> availableFieldsOnBoard = new HashSet<>();
@@ -25,7 +25,7 @@ public class HumanPlayer extends Player {
         if (this == o) return true;
         if (o == null) return false;
 
-        HumanPlayer that = (HumanPlayer) o;
+        Player that = (Player) o;
 
         return name.equals(that.name);
     }
@@ -163,6 +163,7 @@ public class HumanPlayer extends Player {
                         ship.setBufferZone();
                         setAvailableFieldsOnBoard();
                         shipAdded = true;
+                        shipsToSet.replace(entry.getKey(), shipsToSet.get(entry.getKey()) - 1);
                     }
                     printer.printShipAdded(ship);
                     printer.playersBoardDrawer(this);
@@ -177,7 +178,6 @@ public class HumanPlayer extends Player {
         System.out.println("PLAYER - im asked");
         drawer.drawPlayerBoardForShipsSetUp(primaryStage, this);
         drawer.askPlayerForSelectShipToSetWindow(this);
-
 
         return allShipsSet;
     }

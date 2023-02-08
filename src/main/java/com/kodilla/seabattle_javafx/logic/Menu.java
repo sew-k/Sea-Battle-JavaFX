@@ -33,11 +33,7 @@ public class Menu extends Options {
             gameProcessor.startGameFx(primaryStage);
 
         } else if (button.getText().equals(this.options.get(1))) {
-            try {
-                drawer.drawMenu(settings, primaryStage);
-            } catch (Exception e) {
-
-            }
+            drawer.drawSettings();
 
         } else if (button.getText().equals(this.options.get(2))) {
                         //drawer.drawScoreBoard();

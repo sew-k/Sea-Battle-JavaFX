@@ -93,8 +93,13 @@ public class GameProcessor {
         PlayerSettings playerSettings = new PlayerSettings();
         playerOne = getPlayerOneFromPlayerSettingsFx(playerSettings);
         playerTwo = getPlayerTwoFromPlayerSettingsFx(playerSettings);
-        drawer.askAndSetPlayerName(playerOne, "ONE");
-        drawer.askAndSetPlayerName(playerTwo, "TWO");
+
+        if (!ComputerPlayer.class.isInstance(playerOne)) {
+            drawer.askAndSetPlayerName(playerOne, "ONE");
+        }
+        if (!ComputerPlayer.class.isInstance(playerTwo)) {
+            drawer.askAndSetPlayerName(playerTwo, "TWO");
+        }
 
         if (playerOne.getName() != null && playerTwo.getName() != null && playerOne.getName() != "" && playerTwo.getName() != "") {
             return true;
@@ -106,21 +111,31 @@ public class GameProcessor {
     public boolean checkIfPlayersShipsAllSetFx() {
         setCurrentPlayerFx(playerOne);
         Stage stage1 = new Stage();
-        drawer.drawPlayerBoardForShipsSetUp(stage1, playerOne);
+
+        if (!ComputerPlayer.class.isInstance(playerOne)) {
+            drawer.drawPlayerBoardForShipsSetUp(stage1, playerOne);
+        } else {
+            playerOne.shipsSetUp();
+        }
 
         if (playerOne.isAllShipsSet()) {
             stage1.close();
-
             setCurrentPlayerFx(playerTwo);
             Stage stage2 = new Stage();
-            drawer.drawPlayerBoardForShipsSetUp(stage2, playerTwo);
+
+            if (!ComputerPlayer.class.isInstance(playerTwo)) {
+                drawer.drawPlayerBoardForShipsSetUp(stage2, playerTwo);
+            } else {
+                playerTwo.shipsSetUp();
+            }
             if (playerTwo.isAllShipsSet()) {
                 stage2.close();
             }
         }
 
         if (playerOne.isAllShipsSet() && playerTwo.isAllShipsSet()) {
-            System.out.println("checkIfPlayersShipsAllSet(): TRUE");
+            System.out.println("checkIfPlayersShipsAllSet(): TRUE " + playerOne.getName());
+            System.out.println("checkIfPlayersShipsAllSet(): TRUE " + playerTwo.getName());
             return true;
         } else {
             System.out.println("checkIfPlayersShipsAllSet(): FALSE");
@@ -158,13 +173,18 @@ public class GameProcessor {
 
         System.out.println("processing turn for player " + currentPlayer.getName());
 
-        if (currentPlayer.getName().equals("Computer")) {                   //TODO: ComputerPlayer not ready yet
+        if (ComputerPlayer.class.isInstance(currentPlayer)) {
             singleShotProcessor(currentPlayer, otherPlayer);
             if (winnerOfBattleCheck(currentPlayer, otherPlayer) != null) {
                 return false;
             }
         } else {
-            drawer.drawGetReadyWindowForPlayer(currentPlayer);
+            if (PlayerSettings.getCurrentPlayerSettings() == 2) {
+                drawer.drawGetReadyWindowForPlayer(currentPlayer);
+            } else {
+                drawer.drawPlayersBoardsForProcessTheBattle(playerOne, playerTwo);
+            }
+
             //drawer.drawBoardForPlayerTurn(getPlayerOne(), getPlayerTwo());
             if (winnerOfBattleCheck(currentPlayer, otherPlayer) != null) {
                 continueGame = false;
