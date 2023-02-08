@@ -138,6 +138,9 @@ public class Printer {
     public void askForSetShips(Player player) {
         System.out.println("\n" + player.getName() + ", please set up your ships.\n");
     }
+    public String askForSetShipsFx(Player player) {
+        return ("\n" + player.getName() + ", please set up your ships.\n");
+    }
 
     public void incorrectSelectionMessage() {
         System.out.print("Incorrect selection. Please, select again: ");

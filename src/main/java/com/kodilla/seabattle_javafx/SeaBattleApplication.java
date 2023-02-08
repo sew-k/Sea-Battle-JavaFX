@@ -1,5 +1,7 @@
 package com.kodilla.seabattle_javafx;
 
+import com.kodilla.seabattle_javafx.data.HumanPlayer;
+import com.kodilla.seabattle_javafx.data.Player;
 import com.kodilla.seabattle_javafx.logic.*;
 import com.kodilla.seabattle_javafx.presentation.Drawer;
 import javafx.application.Application;
@@ -28,34 +30,6 @@ public class SeaBattleApplication extends Application {
     private Options playerTurnOptions = new PlayerTurnOptions();
     @Override
     public void start(Stage primaryStage) throws IOException {
-        //FXMLLoader fxmlLoader = new FXMLLoader(SeaBattleApplication.class.getResource("hello-view.fxml"));
-        //Scene scene = new Scene(fxmlLoader.load(), 320, 240);
-
-//        FileInputStream fileInputStream = new FileInputStream("C:/dev/kodilla-course/SeaBattle_JavaFX/build/resources/SeaBattleImage.jpg");
-//        VBox root = new VBox();
-//        Image image = new Image(fileInputStream);
-//        ImageView imageView = new ImageView(image);
-//        imageView.setFitWidth(320);
-//        imageView.setPreserveRatio(true);
-//        root.getChildren().add(imageView);
-//
-//        Options mainMenu = new Menu();
-//        List<String> mainMenuList = mainMenu.getOptions();
-//        for (String option : mainMenuList) {
-//            Button bt = new Button(option);
-//            bt.setMinSize(100,30);
-//            root.getChildren().add(bt);
-//        }
-//        root.setAlignment(Pos.BASELINE_CENTER);
-//        Scene scene = new Scene(root,320, 380);
-//
-//        primaryStage.setTitle("Sea Battle Game");
-//        primaryStage.setScene(scene);
-//        primaryStage.show();
-
-        Drawer drawer = new Drawer();
-        drawer.drawMenu(menu, primaryStage);
-
         GameProcessor gameProcessor = new GameProcessor();
         gameProcessor.processGameFX(primaryStage);
     }

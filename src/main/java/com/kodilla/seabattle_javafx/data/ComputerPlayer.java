@@ -4,13 +4,48 @@ import com.kodilla.seabattle_javafx.logic.Settings;
 import com.kodilla.seabattle_javafx.presentation.Printer;
 
 import java.util.*;
+import java.util.concurrent.Delayed;
 
 public class ComputerPlayer extends Player {
 
-    private final String name = "Computer";
+    public final String name = "Computer";
     private List<Ship> ships = new ArrayList<>();
     private Set<String> shots = new HashSet<>();
     private Set<String> availableFieldsOnBoard = new HashSet<>();
+    private Ship currentShip;
+    private Map<Integer,Integer> shipsToSet;
+    private boolean allShipsSet;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+
+        Player that = (Player) o;
+
+        return name.equals(that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
+    @Override
+    public boolean isAllShipsSet() {
+        return allShipsSet;
+    }
+    @Override
+    public void setAllShipsSet(boolean allShipsSet) {
+        this.allShipsSet = allShipsSet;
+    }
+    @Override
+    public Map<Integer, Integer> getShipsToSet() {
+        return shipsToSet;
+    }
+
+    public ComputerPlayer() {
+        shipsToSet = new HashMap<>(Settings.getShipCountSettings());
+        allShipsSet = false;
+    }
     @Override
     public Set<String> getAvailableFieldsOnBoard() {
         return availableFieldsOnBoard;
@@ -84,6 +119,7 @@ public class ComputerPlayer extends Player {
         Map<Integer,Integer> shipCountSettings = Settings.getShipCountSettings();
 
         setAvailableFieldsOnBoard();
+        this.shipsToSet = shipCountSettings;
 
         for (Map.Entry<Integer,Integer> entry : shipCountSettings.entrySet()) {
             for (int j=0; j< entry.getValue(); j++) {
@@ -94,7 +130,6 @@ public class ComputerPlayer extends Player {
                     Ship ship = new Ship();
                     ship.setSize(entry.getKey());
                     Map<String, String> shipStatus = new HashMap<>();
-
 
                     printer.askForSetUpShip(ship);
 
@@ -135,6 +170,7 @@ public class ComputerPlayer extends Player {
                                 printer.printShipAdded(ship);
                                 printer.playersBoardDrawer(this);
                                 shipTrulyAdded = true;
+                                //this.shipsToSet.remove(ship.getSize());
                                 shipAvailabilityOfAddingCheckedEnd = true;
                             }
                         }
@@ -142,5 +178,11 @@ public class ComputerPlayer extends Player {
                 }
             }
         }
+
+        printer.printPlayerShips(this);
+
+        setAllShipsSet(true);
+
+        System.out.println("all ships set? : " + allShipsSet);
     }
 }

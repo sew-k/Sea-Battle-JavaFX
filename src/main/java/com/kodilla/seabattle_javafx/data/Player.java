@@ -1,17 +1,47 @@
 package com.kodilla.seabattle_javafx.data;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import javafx.stage.Stage;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class Player {
-    private String name;
+    public String name;
     private List<Ship> ships;
     public int score;
     private Set<String> shots = new HashSet<>();
     private Set<String> availableFieldsOnBoard = new HashSet<>();
+    private Ship currentShip;
+    private boolean allShipsSet;
+
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null) return false;
+//
+//        Player player = (Player) o;
+//
+//        return name.equals(player.name);
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(name);
+//    }
+
+    public boolean isAllShipsSet() {
+        return allShipsSet;
+    }
+
+    public void setAllShipsSet(boolean allShipsSet) {
+        this.allShipsSet = allShipsSet;
+    }
+
+    private Map<Integer,Integer> shipsToSet;
+
+    public Map<Integer, Integer> getShipsToSet() {
+        return shipsToSet;
+    }
 
     public Set<String> getAvailableFieldsOnBoard() {
         return availableFieldsOnBoard;
@@ -146,4 +176,28 @@ public abstract class Player {
 
     public void shipsSetUp() {
     }
+    public void shipsSetUpFx(Stage primaryStage) {
+
+    }
+    public boolean tryFieldForShipSetUp(String field, Ship ship) {
+        return true;
+    }
+
+    public boolean tryFieldForShipsSetUp(String temporaryField) {
+        return true;
+    }
+
+    public boolean askForAllShipsSetUp(Stage primaryStage) {
+        return allShipsSet;
+
+    }
+
+    public void setCurrentShip(int currentShipSize) {
+
+    }
+
+    public Ship getCurrentShip() {
+        return currentShip;
+    }
+
 }

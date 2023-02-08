@@ -15,10 +15,10 @@ public class Settings extends Options {
     private static Map<Integer,Integer> shipCountSettings;
     static {
         shipCountSettings = new HashMap<>();
-        shipCountSettings.put(4,1);
-        shipCountSettings.put(3,2);
-        shipCountSettings.put(2,3);
-        shipCountSettings.put(1,4);
+        shipCountSettings.put(4,0);
+        shipCountSettings.put(3,0);
+        shipCountSettings.put(2,1);
+        shipCountSettings.put(1,1);
     }
 
     private static boolean onePlayerGame = true;
@@ -61,12 +61,16 @@ public class Settings extends Options {
         return shipCountSettings;
     }
 
-    public static void setShipCountSettings(int shipSize) {
+    public static void setShipCountSettingsFromInteger(int shipSize) {
         Keyboard keyboard = new Keyboard();
         Printer printer = new Printer();
         printer.printShipSettingsToChange(shipSize);
         int key = keyboard.getInt();
         shipCountSettings.replace(shipSize,key);
+    }
+
+    public static void setShipCountSettings(Map<Integer, Integer> shipCountSettings) {
+        Settings.shipCountSettings = shipCountSettings;
     }
 
     public static boolean isOnePlayerGame() {
@@ -140,7 +144,7 @@ public class Settings extends Options {
                             if (changeSettingsOrLeave(key)) {
                                 correct = true;
                                 for (Map.Entry<Integer,Integer> entry : shipCountSettings.entrySet()) {
-                                    setShipCountSettings(entry.getKey());
+                                    setShipCountSettingsFromInteger(entry.getKey());
                                 }
                                 printer.optionsPrinter(this);
                                 selectOption();
