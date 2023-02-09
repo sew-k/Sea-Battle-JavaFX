@@ -182,6 +182,9 @@ public abstract class Player {
     public boolean tryFieldForShipSetUp(String field, Ship ship) {
         return true;
     }
+    public boolean tryFieldForShipSetUp(Stage stage, String field, Ship ship) {
+        return true;
+    }
 
     public boolean tryFieldForShipsSetUp(String temporaryField) {
         return true;

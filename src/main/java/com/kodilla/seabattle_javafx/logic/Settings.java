@@ -11,7 +11,7 @@ import java.util.*;
 
 public class Settings extends Options {
     private final String optionsTitle = "Game Settings";
-    private final List<String> options = new ArrayList<>(Arrays.asList("Ships configuration", "Player settings", "Game board size", "Exit settings"));
+    private final List<String> options = new ArrayList<>(Arrays.asList("Ships configuration", "Player settings", "Game board size", "Cheat mode"));
     private static Map<Integer,Integer> shipCountSettings;
     static {
         shipCountSettings = new HashMap<>();
@@ -22,8 +22,17 @@ public class Settings extends Options {
     }
 
     private static boolean onePlayerGame = true;
+    private static boolean cheatMode = true;         //TODO temporarily
     private String keyForChangeSettings = "y";
     private String keyForLeaveSettings = "n";
+
+    public static boolean isCheatMode() {
+        return cheatMode;
+    }
+
+    public static void setCheatMode(boolean cheatMode) {
+        Settings.cheatMode = cheatMode;
+    }
 
     public String getKeyForChangeSettings() {
         return keyForChangeSettings;

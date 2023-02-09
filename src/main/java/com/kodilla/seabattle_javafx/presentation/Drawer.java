@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Drawer {
 
@@ -26,6 +27,7 @@ public class Drawer {
     private Printer printer = new Printer();
 
     private static String message;
+    private static int gridSize = 40;
 
     public void drawScene(Stage primaryStage, Scene scene) {
         primaryStage.setTitle("Sea Battle Game");
@@ -34,7 +36,6 @@ public class Drawer {
     }
 
     public Scene drawMenu(Options options, Stage primaryStage) throws IOException {
-        //FileInputStream fileInputStream = new FileInputStream("SeaBattleImage.jpg");
         VBox root = new VBox();
         Image image = new Image("SeaBattleImage.jpg");
         ImageView imageView = new ImageView(image);
@@ -65,48 +66,21 @@ public class Drawer {
         scoreBoardLabel.setStyle("-fx-font-weight: bold;");
 
         GridPane scoreBoardGrid = new GridPane();
-        Map<String,Integer> scoreBoardTemporarilyMap = new HashMap<>(ScoreBoard.getScoreMap());
-        Map<String,Integer> InnerScoreBoardTemporarilyMap = new HashMap<>(ScoreBoard.getScoreMap());
-        List<Map.Entry<String, Integer>> scoreBoardList = new ArrayList<>();
-
-        for (Map.Entry<String,Integer> entry : scoreBoardTemporarilyMap.entrySet()) {
-
-
-            Map.Entry<String, Integer> tempEntry = entry;
-            for (Map.Entry<String,Integer> innerEntry : InnerScoreBoardTemporarilyMap.entrySet()) {
-                if (tempEntry.getValue() <= innerEntry.getValue()) {
-                    //tempEntry = innerEntry;
-                    if (!scoreBoardList.contains(innerEntry)) {
-                        scoreBoardList.add(innerEntry);
-                        System.out.println("tempEntry.getValue() < innerEntry.getValue()");
-                    }
-                } else if (tempEntry.getValue() > innerEntry.getValue()) {
-                        //tempEntry = innerEntry;
-                        if (!scoreBoardList.contains(tempEntry)) {
-                            scoreBoardList.add(tempEntry);
-                            System.out.println("tempEntry.getValue() > innerEntry.getValue()");
-                        }
-                }
-//                else if (tempEntry.getValue() == innerEntry.getValue()) {
-//                    if (!scoreBoardList.contains(tempEntry)) {
-//                        scoreBoardList.add(tempEntry);
-//                        System.out.println("tempEntry.getValue() == innerEntry.getValue()");
-//                    }
-//                }
-            }
+        List<Map.Entry<String, Integer>> scoreBoardListSorted = new ArrayList<>(ScoreBoard.getScoreMap().entrySet().stream().toList());
+        scoreBoardListSorted.sort(Map.Entry.comparingByValue());
+        int j = 0;
+        for (int i = (scoreBoardListSorted.size() - 1); i >= 0; i--) {
+            String name = scoreBoardListSorted.get(i).getKey();
+            String score = Integer.toString(scoreBoardListSorted.get(i).getValue());
+            scoreBoardGrid.add(new Label((Integer.toString(j + 1)) + ". "), 0, j);
+            scoreBoardGrid.add(new Label(name), 1, j);
+            scoreBoardGrid.add(new Label(score), 2, j);
+            j++;
         }
-
-        for (int i = 0; i < scoreBoardList.size(); i++) {
-            String name = scoreBoardList.get(i).getKey();
-            String score = Integer.toString(scoreBoardList.get(i).getValue());
-            scoreBoardGrid.add(new Label((Integer.toString(i + 1)) + ". "), 0, i);
-            scoreBoardGrid.add(new Label(name), 1, i);
-            scoreBoardGrid.add(new Label(score), 2, i);
-
-        }
-
 
         Button okButton = new Button("Ok");
+        okButton.setMinSize(130,30);
+        okButton.setAlignment(Pos.CENTER);
         okButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -117,9 +91,6 @@ public class Drawer {
         borderPane.setTop(scoreBoardLabel);
         borderPane.setCenter(scoreBoardGrid);
         borderPane.setBottom(okButton);
-        //VBox vBox = new VBox(scoreBoardLabel, scoreBoardGrid, okButton);
-        //vBox.setAlignment(Pos.CENTER);
-        //vBox.setMinSize(100,30);
         Scene scene = new Scene(borderPane);
         stage.setScene(scene);
         stage.showAndWait();
@@ -131,7 +102,6 @@ public class Drawer {
         VBox board = new VBox();
         Board playerBoard = new Board();
         GridPane gridPaneBoard = new GridPane();
-        int gridSize = 35;
 
         for (int column = 0; column < playerBoard.getColumns().size(); column++) {
             Label columLabel = new Label(playerBoard.getColumns().get(column));
@@ -146,37 +116,63 @@ public class Drawer {
                 rowLabel.setMaxSize(gridSize, gridSize);
                 rowLabel.setAlignment(Pos.CENTER);
                 gridPaneBoard.add(rowLabel,0,row + 1);
-                Button fieldBt = new Button(playerBoard.getColumns().get(column) + playerBoard.getRows().get(row));
-                fieldBt.setTextFill(Color.LIGHTBLUE);
+                String coordinate = playerBoard.getColumns().get(column) + playerBoard.getRows().get(row);
+                Button fieldBt = new Button(coordinate);
+                fieldBt.setTextFill(Color.GRAY);
+                fieldBt.setId(coordinate);
                 fieldBt.setMinSize(gridSize, gridSize);
                 fieldBt.setMaxSize(gridSize, gridSize);
+                List<String> playerFieldsOfShipsList = player.getShips().stream()
+                        .flatMap(s -> s.getStatusOnBoard().entrySet().stream())
+                        .map(e -> e.getKey())
+                        .collect(Collectors.toList());
+                if (playerFieldsOfShipsList.size() > 0) {
+                    for (String coordinatesOfFieldNotAvailable : playerFieldsOfShipsList) {
+                        if (fieldBt.getId().equals(coordinatesOfFieldNotAvailable)) {
+                            fieldBt.setStyle("-fx-background-color: gray;");
+                            fieldBt.setDisable(true);
+                        }
+                    }
+                }
+
                 fieldBt.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent event) {
+                        if (GameProcessor.currentPlayer.getCurrentShip() != null) {
+                            if (GameProcessor.currentPlayer.tryFieldForShipSetUp(primaryStage, fieldBt.getId(), GameProcessor.currentPlayer.getCurrentShip())) {
+                                //fieldBt.setVisible(false);
+                                fieldBt.setStyle("-fx-background-color: gray;");
 
-                        if (GameProcessor.currentPlayer.tryFieldForShipSetUp(fieldBt.getText(), GameProcessor.currentPlayer.getCurrentShip())) {
-                            fieldBt.setVisible(false);
+                                if (GameProcessor.currentPlayer.isAllShipsSet()) {
+                                    primaryStage.close();
+                                }
+                            } else {
+                                System.out.println("FIELD NOT AVAILABLE");
 
-//                            if () {
-//
-//                            }
-
-                            if (GameProcessor.currentPlayer.isAllShipsSet()) {
-                                primaryStage.close();
                             }
                         } else {
-                            System.out.println("FIELD NOT AVAILABLE");
-
+                            drawMessageForPlayer(GameProcessor.currentPlayer, "First you must select ship to set!");
                         }
                     }
                 });
                 gridPaneBoard.add(fieldBt,column + 1,row + 1);
             }
         }
+//        Button nextShipButton = new Button("Set next ship");
+//        nextShipButton.setMinSize(130,30);
+//        nextShipButton.setOnAction(new EventHandler<ActionEvent>() {
+//            @Override
+//            public void handle(ActionEvent event) {
+//                primaryStage.close();
+//                //drawPlayerBoardForShipsSetUp(new Stage(), GameProcessor.currentPlayer);
+//            }
+//        });
+//        HBox buttonsHBox = new HBox(nextShipButton);
         Pane shipsConfigurationPane = drawShipsConfigurationPane();
         board.getChildren().addAll(gridPaneBoard, shipsConfigurationPane);
         borderPane.setCenter(board);
         borderPane.setTop(text);
+//        borderPane.setBottom(buttonsHBox);
         Scene scene = new Scene(borderPane);
         primaryStage.setScene(scene);
         primaryStage.showAndWait();
@@ -190,17 +186,18 @@ public class Drawer {
         Player currentPlayer = GameProcessor.currentPlayer;
 
         int i = 0;
-
         for (Map.Entry<Integer,Integer> entry : currentPlayer.getShipsToSet().entrySet()) {
             Button buttonAsShip = new Button();
             buttonAsShip.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent event) {
                     Player thatPlayer = GameProcessor.currentPlayer;
+                    buttonAsShip.setStyle("-fx-background-color: gray");
                     thatPlayer.setCurrentShip(entry.getKey());
                     message = " - you select ship - size: " + currentPlayer.getCurrentShip() + " to set on board";
                     System.out.println("Current player: " + currentPlayer);
                     System.out.println("Current ship: " + currentPlayer.getCurrentShip());
+                    borderPane.setDisable(true);
                 }
             });
             double buttonWidth = 30;
@@ -222,6 +219,7 @@ public class Drawer {
         Stage stage = new Stage();
         Label text = new Label("Player '" + currentPlayer.getName() + "', get ready for your turn!");
         Button okButton = new Button("Ready!");
+        okButton.setMinSize(130,30);
         okButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -230,6 +228,7 @@ public class Drawer {
             }
         });
         Button giveUpButton = new Button("Exit game");
+        giveUpButton.setMinSize(130,30);
         giveUpButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -250,6 +249,7 @@ public class Drawer {
         Stage primaryStage = new Stage();
         Label text = new Label("This is your battlefield...\n");
         Button endTurnButton = new Button("End turn");
+        endTurnButton.setMinSize(130,30);
         endTurnButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -262,6 +262,7 @@ public class Drawer {
             }
         });
         Button giveUpAndExitGame = new Button("Exit game");
+        giveUpAndExitGame.setMinSize(130,30);
         giveUpAndExitGame.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -286,7 +287,6 @@ public class Drawer {
         Board playerBoard = new Board();
         Label text = new Label("\nPlayer '"+ player.getName() +" board \n");
         GridPane gridPaneBoard = new GridPane();
-        int gridSize = 30;
 
         for (int column = 0; column < playerBoard.getColumns().size(); column++) {
             Label columLabel = new Label(playerBoard.getColumns().get(column));
@@ -346,15 +346,23 @@ public class Drawer {
             }
         }
 
-        if (isFieldAnyShipStatus.equals("good")) {
-            fieldButton.setTextFill(Color.GREEN);
-        } else if (isFieldAnyShipStatus.equals("hit")) {
-            fieldButton.setTextFill(Color.ORANGE);
-        } else if (isFieldAnyShipStatus.equals("sink")) {
-            fieldButton.setTextFill(Color.RED);
+        if (Settings.isCheatMode()) {
+            if (isFieldAnyShipStatus.equals("good")) {
+                fieldButton.setTextFill(Color.GREEN);
+                fieldButton.setStyle("-fx-background-color: LIGHTGREEN");
+            } else if (isFieldAnyShipStatus.equals("hit")) {
+                fieldButton.setTextFill(Color.ORANGE);
+                fieldButton.setStyle("-fx-background-color: GOLD");
+            } else if (isFieldAnyShipStatus.equals("sink")) {
+                fieldButton.setTextFill(Color.RED);
+                fieldButton.setStyle("-fx-background-color: PINK");
+            } else {
+                fieldButton.setTextFill(Color.GRAY);
+            }
         } else {
-            fieldButton.setTextFill(Color.LIGHTBLUE);
+            fieldButton.setText("");
         }
+
         fieldButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -445,6 +453,7 @@ public class Drawer {
         Label label = new Label("Player " + numberOfPlayer + " - please enter your name: ");
         TextField name = new TextField();
         Button confirmBt = new Button("Confirm");
+        confirmBt.setMinSize(130,30);
         confirmBt.isDefaultButton();
         confirmBt.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -456,6 +465,7 @@ public class Drawer {
             }
         });
         Button cancelBt = new Button("Cancel/exit");
+        cancelBt.setMinSize(130,30);
         cancelBt.isCancelButton();
         cancelBt.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -474,24 +484,26 @@ public class Drawer {
         stage.setScene(scene);
         stage.showAndWait();
     }
-    public void drawMessageForPlayer(Player player, Pane pane) {
+    public void drawMessageForPlayer(Player player, String message) {
         Stage stage = new Stage();
-        Label label = new Label("Player '" + player.getName());
+        Label label = new Label("Player '" + player.getName() + "': " + message);
         Button confirmBt = new Button("OK");
+        confirmBt.setMinSize(130,30);
         confirmBt.isDefaultButton();
         confirmBt.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                System.out.println("PLAYER " + player.getName() + "SET : OK");
                 stage.close();
             }
         });
 
-        VBox vbox = new VBox();
-        HBox hbox1 = new HBox();
-        hbox1.getChildren().addAll(confirmBt);
-        vbox.getChildren().addAll(label, pane, hbox1);
-        Scene scene = new Scene(vbox);
+        VBox vBox = new VBox();
+        HBox hBox = new HBox();
+        hBox.getChildren().addAll(confirmBt);
+        hBox.setAlignment(Pos.CENTER);
+        vBox.getChildren().addAll(label, hBox);
+        vBox.setAlignment(Pos.CENTER);
+        Scene scene = new Scene(vBox);
         stage.setScene(scene);
         stage.showAndWait();
     }
@@ -499,6 +511,7 @@ public class Drawer {
         Stage stage = new Stage();
         Label label = new Label("Player '" + player.getName());
         Button confirmBt = new Button("OK");
+        confirmBt.setMinSize(130,30);
         confirmBt.isDefaultButton();
         confirmBt.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -508,6 +521,7 @@ public class Drawer {
             }
         });
         Button cancelBt = new Button("Cancel/ exit game");
+        cancelBt.setMinSize(130,30);
         cancelBt.isCancelButton();
         cancelBt.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -528,6 +542,7 @@ public class Drawer {
         Stage stage = new Stage();
         Label label = new Label("Player '" + winner.getName() + "' win game!");
         Button confirmBt = new Button("OK");
+        confirmBt.setMinSize(130,30);
         confirmBt.isDefaultButton();
         confirmBt.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -551,9 +566,6 @@ public class Drawer {
         PlayerSettings playerSettings = new PlayerSettings();
         Label titlePlayerSettingsLabel = new Label(playerSettings.getOptionsTitle());
         List<String> playerSettingsList = new ArrayList<>(playerSettings.getOptions());
-
-        Board.getColumnsCount();
-        Board.getRowsCount();
 
         Stage stage = new Stage();
 
@@ -636,10 +648,19 @@ public class Drawer {
         VBox boardSizeVBox = new VBox(boardSizeLabel, boardHeightHBox, boardWidthHBox);
         boardSizeVBox.setStyle("-fx-border-color: grey;");
 
+        Label cheatModeLabel = new Label(settings.getOptions().get(3));
+        cheatModeLabel.setStyle("-fx-font-weight: bold;");
+        RadioButton cheatModeRadioButton = new RadioButton("Cheat mode [on/off]");
+        cheatModeRadioButton.setSelected(settings.isCheatMode());
+        VBox cheatModeVBox = new VBox(cheatModeLabel, cheatModeRadioButton);
+        cheatModeVBox.setStyle("-fx-border-color: grey;");
+
         Button acceptButton = new Button("Accept & Save");
+        acceptButton.setMinSize(130,30);
         acceptButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+                Settings settings = new Settings();
                 Board.setRowsCount(Integer.parseInt(heightTextField.getText()));
                 System.out.println("Board size height set to: " + Board.getRowsCount());
                 Board.setColumnsCount(Integer.parseInt(widthTextField.getText()));
@@ -652,10 +673,13 @@ public class Drawer {
                 int selected = playerSettingsRadioButtonsGroup.getToggles().indexOf(playerSettingsRadioButtonsGroup.getSelectedToggle());
                 PlayerSettings.setCurrentPlayerSettings(selected);
 
+                Settings.setCheatMode(cheatModeRadioButton.isSelected());
+
                 stage.close();
             }
         });
         Button cancelButton = new Button("Cancel");
+        cancelButton.setMinSize(130,30);
         cancelButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -666,8 +690,7 @@ public class Drawer {
         buttonsHBox.setAlignment(Pos.CENTER);
         buttonsHBox.setStyle("-fx-border-color: grey;");
         VBox vBox = new VBox();
-        vBox.setSpacing(10);
-        vBox.getChildren().addAll(playerSettingsVBox, shipCountSettingsBorderPane, boardSizeVBox, buttonsHBox);
+        vBox.getChildren().addAll(playerSettingsVBox, shipCountSettingsBorderPane, boardSizeVBox, cheatModeVBox, buttonsHBox);
         vBox.setAlignment(Pos.CENTER);
         Scene scene = new Scene(vBox);
         stage.setScene(scene);

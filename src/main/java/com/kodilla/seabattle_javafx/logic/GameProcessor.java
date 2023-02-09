@@ -112,25 +112,28 @@ public class GameProcessor {
         setCurrentPlayerFx(playerOne);
         Stage stage1 = new Stage();
 
-        if (!ComputerPlayer.class.isInstance(playerOne)) {
-            drawer.drawPlayerBoardForShipsSetUp(stage1, playerOne);
-        } else {
-            playerOne.shipsSetUp();
-        }
+//        if (!ComputerPlayer.class.isInstance(playerOne)) {
+//            drawer.drawPlayerBoardForShipsSetUp(stage1, playerOne);
+//        } else {
+//            playerOne.shipsSetUp();
+//        }
+        playerOne.shipsSetUp();
 
         if (playerOne.isAllShipsSet()) {
-            stage1.close();
             setCurrentPlayerFx(playerTwo);
-            Stage stage2 = new Stage();
-
-            if (!ComputerPlayer.class.isInstance(playerTwo)) {
-                drawer.drawPlayerBoardForShipsSetUp(stage2, playerTwo);
-            } else {
-                playerTwo.shipsSetUp();
-            }
-            if (playerTwo.isAllShipsSet()) {
-                stage2.close();
-            }
+//            stage1.close();
+//            setCurrentPlayerFx(playerTwo);
+//            Stage stage2 = new Stage();
+//
+//            if (!ComputerPlayer.class.isInstance(playerTwo)) {
+//                drawer.drawPlayerBoardForShipsSetUp(stage2, playerTwo);
+//            } else {
+//                playerTwo.shipsSetUp();
+//            }
+//            if (playerTwo.isAllShipsSet()) {
+//                stage2.close();
+//            }
+            playerTwo.shipsSetUp();
         }
 
         if (playerOne.isAllShipsSet() && playerTwo.isAllShipsSet()) {

@@ -10,8 +10,8 @@ public class ScoreBoard {
         //temporarily values
         scoreMap = new HashMap<>();
         scoreMap.put("Aaaa", 2);
-        scoreMap.put("Bbbbb", 1);
-        scoreMap.put("Cc", 10);
+        scoreMap.put("Bbbb", 1);
+        scoreMap.put("Cccc", 10);
         scoreMap.put("Dddd", 1);
     }
 

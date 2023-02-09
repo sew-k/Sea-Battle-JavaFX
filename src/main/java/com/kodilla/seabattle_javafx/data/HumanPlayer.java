@@ -1,5 +1,6 @@
 package com.kodilla.seabattle_javafx.data;
 
+import com.kodilla.seabattle_javafx.logic.GameProcessor;
 import com.kodilla.seabattle_javafx.logic.Settings;
 import com.kodilla.seabattle_javafx.presentation.Drawer;
 import com.kodilla.seabattle_javafx.presentation.Keyboard;
@@ -111,61 +112,66 @@ public class HumanPlayer extends Player {
 
     @Override
     public void shipsSetUp() {
-        Printer printer = new Printer();
-        Keyboard keyboard = new Keyboard();
-        printer.printShipCountSettings(Settings.getShipCountSettings());
-        Map<Integer,Integer> shipCountSettings = Settings.getShipCountSettings();
+//        Printer printer = new Printer();
+//        Keyboard keyboard = new Keyboard();
+//        printer.printShipCountSettings(Settings.getShipCountSettings());
+//        Map<Integer,Integer> shipCountSettings = Settings.getShipCountSettings();
+//
+//        setAvailableFieldsOnBoard();
+//
+//        for (Map.Entry<Integer,Integer> entry : shipCountSettings.entrySet()) {
+//                for (int j=0; j< entry.getValue(); j++) {
+//                    Ship ship = new Ship();
+//                    ship.setSize(entry.getKey());
+//                    Map<String,String> shipStatus = new HashMap<>();
+//
+//                    printer.askForSetUpShip(ship);
+//
+//                    boolean shipAdded = false;
+//                    while (!shipAdded) {
+//                        for (int i = 0; i < entry.getKey(); i++) {    // iterate field of ship to set up
+//                            if (i == 0) {
+//                                printer.askForField(this);
+//                            } else if (i > 0) {
+//                                printer.askForNextField(this);
+//                            }
+//                            boolean correct = false;
+//                            while (!correct) {
+//                                List<String> availableFieldsForShipSetUp = new ArrayList<>();
+//                                availableFieldsForShipSetUp = getAvailableFieldsForShipSetUp(ship).stream()
+//                                        .filter(c -> getAvailableFieldsOnBoard().contains(c))
+//                                        .toList();
+//
+//                                printer.printAvailableFieldsForShipSetUp(availableFieldsForShipSetUp);
+//
+//                                String temporaryField = keyboard.getString();
+//                                shipStatus = ship.getStatusOnBoard();
+//
+//                                if (getAvailableFieldsForShipSetUp(ship).contains(temporaryField)) {
+//                                    shipStatus.put(temporaryField, "good");
+//                                    correct = true;
+//                                } else {
+//                                    printer.incorrectSelectionMessage();
+//                                    printer.askForField(this);
+//                                }
+//                            }
+//                            ship.setStatusOnBoard(shipStatus);
+//                            ship.setBufferZone();
+//                        }
+//                        addShip(ship);
+//                        ship.setBufferZone();
+//                        setAvailableFieldsOnBoard();
+//                        shipAdded = true;
+//                        shipsToSet.replace(entry.getKey(), shipsToSet.get(entry.getKey()) - 1);
+//                    }
+//                    printer.printShipAdded(ship);
+//                    printer.playersBoardDrawer(this);
+//                }
+//        }
 
-        setAvailableFieldsOnBoard();
-
-        for (Map.Entry<Integer,Integer> entry : shipCountSettings.entrySet()) {
-                for (int j=0; j< entry.getValue(); j++) {
-                    Ship ship = new Ship();
-                    ship.setSize(entry.getKey());
-                    Map<String,String> shipStatus = new HashMap<>();
-
-                    printer.askForSetUpShip(ship);
-
-                    boolean shipAdded = false;
-                    while (!shipAdded) {
-                        for (int i = 0; i < entry.getKey(); i++) {    // iterate field of ship to set up
-                            if (i == 0) {
-                                printer.askForField(this);
-                            } else if (i > 0) {
-                                printer.askForNextField(this);
-                            }
-                            boolean correct = false;
-                            while (!correct) {
-                                List<String> availableFieldsForShipSetUp = new ArrayList<>();
-                                availableFieldsForShipSetUp = getAvailableFieldsForShipSetUp(ship).stream()
-                                        .filter(c -> getAvailableFieldsOnBoard().contains(c))
-                                        .toList();
-
-                                printer.printAvailableFieldsForShipSetUp(availableFieldsForShipSetUp);
-
-                                String temporaryField = keyboard.getString();
-                                shipStatus = ship.getStatusOnBoard();
-
-                                if (getAvailableFieldsForShipSetUp(ship).contains(temporaryField)) {
-                                    shipStatus.put(temporaryField, "good");
-                                    correct = true;
-                                } else {
-                                    printer.incorrectSelectionMessage();
-                                    printer.askForField(this);
-                                }
-                            }
-                            ship.setStatusOnBoard(shipStatus);
-                            ship.setBufferZone();
-                        }
-                        addShip(ship);
-                        ship.setBufferZone();
-                        setAvailableFieldsOnBoard();
-                        shipAdded = true;
-                        shipsToSet.replace(entry.getKey(), shipsToSet.get(entry.getKey()) - 1);
-                    }
-                    printer.printShipAdded(ship);
-                    printer.playersBoardDrawer(this);
-                }
+        Drawer drawer = new Drawer();
+        while (!isAllShipsSet()) {
+            drawer.drawPlayerBoardForShipsSetUp(new Stage(), GameProcessor.currentPlayer);
         }
     }
 
@@ -180,7 +186,7 @@ public class HumanPlayer extends Player {
         return allShipsSet;
     }
     @Override
-    public boolean tryFieldForShipSetUp(String temporaryField, Ship ship) {
+    public boolean tryFieldForShipSetUp(Stage stage, String temporaryField, Ship ship) {
         System.out.println("trying field: " + temporaryField);
 
         setAvailableFieldsOnBoard();
@@ -200,6 +206,8 @@ public class HumanPlayer extends Player {
                 System.out.println("set field for ship: " + temporaryField);
                 if (currentShipStatus.size() == ship.getSize()) {
                     addShip(ship);
+                    stage.close();
+
                     ship.setBufferZone();
                     setAvailableFieldsOnBoard();
                     //shipAdded = true;
@@ -207,6 +215,8 @@ public class HumanPlayer extends Player {
                     printer.printPlayerShips(this);
                     if (shipsToSet.get(ship.getSize()) > 0) {
                         shipsToSet.replace(ship.getSize(), (shipsToSet.get(ship.getSize()) - 1));
+//                        Drawer drawer = new Drawer();
+//                        drawer.drawPlayerBoardForShipsSetUp(stage, GameProcessor.currentPlayer);
                     }
 
                     if (shipsToSet.values().stream().allMatch(n -> n == 0)) {
