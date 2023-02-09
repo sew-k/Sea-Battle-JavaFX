@@ -1,6 +1,5 @@
 package com.kodilla.seabattle_javafx.data;
 
-import com.kodilla.seabattle_javafx.logic.GameProcessor;
 import com.kodilla.seabattle_javafx.logic.Settings;
 import com.kodilla.seabattle_javafx.presentation.Drawer;
 import com.kodilla.seabattle_javafx.presentation.Keyboard;
@@ -8,7 +7,6 @@ import com.kodilla.seabattle_javafx.presentation.Printer;
 import javafx.stage.Stage;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class HumanPlayer extends Player {
 

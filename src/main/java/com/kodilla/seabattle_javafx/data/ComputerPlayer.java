@@ -4,7 +4,6 @@ import com.kodilla.seabattle_javafx.logic.Settings;
 import com.kodilla.seabattle_javafx.presentation.Printer;
 
 import java.util.*;
-import java.util.concurrent.Delayed;
 
 public class ComputerPlayer extends Player {
 

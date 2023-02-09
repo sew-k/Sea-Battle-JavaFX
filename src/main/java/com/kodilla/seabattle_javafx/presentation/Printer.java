@@ -124,8 +124,6 @@ public class Printer {
         System.out.println("- rows: " + Board.getRowsCount());
     }
 
-
-
     public void askForSelect() {
         System.out.print("Please select an option: ");
     }

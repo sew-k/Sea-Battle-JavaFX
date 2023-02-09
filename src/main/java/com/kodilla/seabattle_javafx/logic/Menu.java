@@ -1,9 +1,6 @@
 package com.kodilla.seabattle_javafx.logic;
 
 import com.kodilla.seabattle_javafx.presentation.Drawer;
-import com.kodilla.seabattle_javafx.presentation.Keyboard;
-import com.kodilla.seabattle_javafx.presentation.Printer;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
@@ -30,6 +27,7 @@ public class Menu extends Options {
         Settings settings = new Settings();
 
         if (button.getText().equals(this.options.get(0))) {
+            GameProcessor.continueGame = true;
             gameProcessor.startGameFx(primaryStage);
 
         } else if (button.getText().equals(this.options.get(1))) {

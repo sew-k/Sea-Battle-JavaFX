@@ -82,7 +82,7 @@ public class GameProcessor {
             System.out.println("checking is playerTwo set as waiting: " + playerTwo.equals(waitingPlayer));
 
             if (checkIfPlayersShipsAllSetFx()) {
-                processGameFx(primaryStage, playerOne, playerTwo);
+                processTheBattleFx(primaryStage, playerOne, playerTwo);
             }
 
         } else {
@@ -142,7 +142,7 @@ public class GameProcessor {
             return false;
         }
     }
-    public void processGameFx(Stage primaryStage, Player playerOne, Player playerTwo) {
+    public void processTheBattleFx(Stage primaryStage, Player playerOne, Player playerTwo) {
         boolean battleEnd = false;
         while (!battleEnd) {
             if (!singleRoundProcessorFx(primaryStage, playerOne, playerTwo)) {
