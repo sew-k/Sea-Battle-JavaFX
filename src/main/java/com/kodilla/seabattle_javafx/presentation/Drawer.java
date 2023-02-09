@@ -62,7 +62,69 @@ public class Drawer {
     }
 
     public void drawScoreBoard() {                          //TODO - to complete
+        Stage stage = new Stage();
+        Label scoreBoardLabel = new Label("Score board");
+        scoreBoardLabel.setStyle("-fx-font-weight: bold;");
 
+        GridPane scoreBoardGrid = new GridPane();
+        Map<String,Integer> scoreBoardTemporarilyMap = new HashMap<>(ScoreBoard.getScoreMap());
+        Map<String,Integer> InnerScoreBoardTemporarilyMap = new HashMap<>(ScoreBoard.getScoreMap());
+        List<Map.Entry<String, Integer>> scoreBoardList = new ArrayList<>();
+
+        for (Map.Entry<String,Integer> entry : scoreBoardTemporarilyMap.entrySet()) {
+
+
+            Map.Entry<String, Integer> tempEntry = entry;
+            for (Map.Entry<String,Integer> innerEntry : InnerScoreBoardTemporarilyMap.entrySet()) {
+                if (tempEntry.getValue() <= innerEntry.getValue()) {
+                    //tempEntry = innerEntry;
+                    if (!scoreBoardList.contains(innerEntry)) {
+                        scoreBoardList.add(innerEntry);
+                        System.out.println("tempEntry.getValue() < innerEntry.getValue()");
+                    }
+                } else if (tempEntry.getValue() > innerEntry.getValue()) {
+                        //tempEntry = innerEntry;
+                        if (!scoreBoardList.contains(tempEntry)) {
+                            scoreBoardList.add(tempEntry);
+                            System.out.println("tempEntry.getValue() > innerEntry.getValue()");
+                        }
+                }
+//                else if (tempEntry.getValue() == innerEntry.getValue()) {
+//                    if (!scoreBoardList.contains(tempEntry)) {
+//                        scoreBoardList.add(tempEntry);
+//                        System.out.println("tempEntry.getValue() == innerEntry.getValue()");
+//                    }
+//                }
+            }
+        }
+
+        for (int i = 0; i < scoreBoardList.size(); i++) {
+            String name = scoreBoardList.get(i).getKey();
+            String score = Integer.toString(scoreBoardList.get(i).getValue());
+            scoreBoardGrid.add(new Label((Integer.toString(i + 1)) + ". "), 0, i);
+            scoreBoardGrid.add(new Label(name), 1, i);
+            scoreBoardGrid.add(new Label(score), 2, i);
+
+        }
+
+
+        Button okButton = new Button("Ok");
+        okButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                stage.close();
+            }
+        });
+        BorderPane borderPane = new BorderPane();
+        borderPane.setTop(scoreBoardLabel);
+        borderPane.setCenter(scoreBoardGrid);
+        borderPane.setBottom(okButton);
+        //VBox vBox = new VBox(scoreBoardLabel, scoreBoardGrid, okButton);
+        //vBox.setAlignment(Pos.CENTER);
+        //vBox.setMinSize(100,30);
+        Scene scene = new Scene(borderPane);
+        stage.setScene(scene);
+        stage.showAndWait();
     }
 
     public void  drawPlayerBoardForShipsSetUp(Stage primaryStage, Player player) {
@@ -195,6 +257,10 @@ public class Drawer {
             public void handle(ActionEvent event) {
                 GameProcessor gameProcessor = new GameProcessor();
                 primaryStage.close();
+                if (gameProcessor.winnerOfBattleCheck(GameProcessor.currentPlayer, GameProcessor.waitingPlayer) != null) {
+                    Drawer drawer = new Drawer();
+                    drawer.drawPlayerWinGame(gameProcessor.winnerOfBattleCheck(GameProcessor.currentPlayer, GameProcessor.waitingPlayer));
+                }
             }
         });
         Button giveUpAndExitGame = new Button("Exit game");
@@ -296,7 +362,6 @@ public class Drawer {
             public void handle(ActionEvent event) {
                 fieldButton.setVisible(false);
                 GameProcessor gameProcessor = new GameProcessor();
-                System.out.println("TO COMPLETE SINGLE SHOT PROCESSING IN DRAWER - BUTTON!!!");
                 gameProcessor.singleShotProcessorFx(GameProcessor.currentPlayer, GameProcessor.waitingPlayer, buttonCoordinates);
             }
         });
@@ -411,7 +476,28 @@ public class Drawer {
         stage.setScene(scene);
         stage.showAndWait();
     }
-    public void askPlayer(Player player, Pane pane) {
+    public void drawMessageForPlayer(Player player, Pane pane) {
+        Stage stage = new Stage();
+        Label label = new Label("Player '" + player.getName());
+        Button confirmBt = new Button("OK");
+        confirmBt.isDefaultButton();
+        confirmBt.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                System.out.println("PLAYER " + player.getName() + "SET : OK");
+                stage.close();
+            }
+        });
+
+        VBox vbox = new VBox();
+        HBox hbox1 = new HBox();
+        hbox1.getChildren().addAll(confirmBt);
+        vbox.getChildren().addAll(label, pane, hbox1);
+        Scene scene = new Scene(vbox);
+        stage.setScene(scene);
+        stage.showAndWait();
+    }
+    public void drawDialogMessageForPlayer(Player player, Pane pane) {
         Stage stage = new Stage();
         Label label = new Label("Player '" + player.getName());
         Button confirmBt = new Button("OK");
@@ -441,7 +527,23 @@ public class Drawer {
         stage.showAndWait();
     }
     public void drawPlayerWinGame(Player winner) {
+        Stage stage = new Stage();
+        Label label = new Label("Player '" + winner.getName() + "' win game!");
+        Button confirmBt = new Button("OK");
+        confirmBt.isDefaultButton();
+        confirmBt.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                stage.close();
+            }
+        });
 
+        VBox vbox = new VBox();
+        vbox.setAlignment(Pos.CENTER);
+        vbox.getChildren().addAll(label, confirmBt);
+        Scene scene = new Scene(vbox);
+        stage.setScene(scene);
+        stage.showAndWait();
     }
     public void drawSettings() {
         Settings settings = new Settings();
@@ -460,10 +562,30 @@ public class Drawer {
         Label playerSettingsLabel = new Label(settings.getOptions().get(1));
         playerSettingsLabel.setStyle("-fx-font-weight: bold;");
         RadioButton pVsCn = new RadioButton(playerSettings.getOptions().get(0));
+        pVsCn.setId(Integer.toString(0));
         RadioButton pVsCh = new RadioButton(playerSettings.getOptions().get(1));
+        pVsCh.setId(Integer.toString(1));
         pVsCh.setDisable(true);
         RadioButton pVsp = new RadioButton(playerSettings.getOptions().get(2));
+        pVsp.setId(Integer.toString(2));
         RadioButton cVsC = new RadioButton(playerSettings.getOptions().get(3));
+        cVsC.setId(Integer.toString(3));
+        ToggleGroup playerSettingsRadioButtonsGroup = new ToggleGroup();
+        pVsCn.setToggleGroup(playerSettingsRadioButtonsGroup);
+        pVsCh.setToggleGroup(playerSettingsRadioButtonsGroup);
+        pVsp.setToggleGroup(playerSettingsRadioButtonsGroup);
+        cVsC.setToggleGroup(playerSettingsRadioButtonsGroup);
+
+        if (PlayerSettings.getCurrentPlayerSettings() == Integer.parseInt(pVsCn.getId())) {
+            playerSettingsRadioButtonsGroup.selectToggle(pVsCn);
+        } else if (PlayerSettings.getCurrentPlayerSettings() == Integer.parseInt(pVsCh.getId())) {
+            playerSettingsRadioButtonsGroup.selectToggle(pVsCh);
+        } else if (PlayerSettings.getCurrentPlayerSettings() == Integer.parseInt(pVsp.getId())) {
+            playerSettingsRadioButtonsGroup.selectToggle(pVsp);
+        } else if (PlayerSettings.getCurrentPlayerSettings() == Integer.parseInt(cVsC.getId())) {
+            playerSettingsRadioButtonsGroup.selectToggle(cVsC);
+        }
+
         VBox playerSettingsVBox = new VBox(playerSettingsLabel, pVsCn, pVsCh, pVsp, cVsC);
         playerSettingsVBox.setStyle("-fx-border-color: grey;");
 
@@ -528,6 +650,9 @@ public class Drawer {
                     temporaryShipCountSettings.replace(Integer.parseInt(textFieldList.get(j).getId()), Integer.parseInt(textFieldList.get(j).getText()));
                 }
                 Settings.setShipCountSettings(temporaryShipCountSettings);
+
+                int selected = playerSettingsRadioButtonsGroup.getToggles().indexOf(playerSettingsRadioButtonsGroup.getSelectedToggle());
+                PlayerSettings.setCurrentPlayerSettings(selected);
 
                 stage.close();
             }

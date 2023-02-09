@@ -36,8 +36,8 @@ public class Menu extends Options {
             drawer.drawSettings();
 
         } else if (button.getText().equals(this.options.get(2))) {
-                        //drawer.drawScoreBoard();
-                        //processor.processGame();
+            drawer.drawScoreBoard();
+
         } else if (button.getText().equals(this.options.get(3))) {
             gameProcessor.exitGameFx(primaryStage);
         }

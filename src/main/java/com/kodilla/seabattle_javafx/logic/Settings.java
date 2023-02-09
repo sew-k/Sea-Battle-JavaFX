@@ -227,7 +227,7 @@ public class Settings extends Options {
                     }
 
                 } else if (Integer.parseInt(key) == 3) {
-                    processor.processGame();
+                    //processor.processGame();
                 }
                 return;
             } else {

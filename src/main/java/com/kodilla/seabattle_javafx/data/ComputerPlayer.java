@@ -8,7 +8,7 @@ import java.util.concurrent.Delayed;
 
 public class ComputerPlayer extends Player {
 
-    public final String name = "Computer";
+    private final String name = "Computer";
     private List<Ship> ships = new ArrayList<>();
     private Set<String> shots = new HashSet<>();
     private Set<String> availableFieldsOnBoard = new HashSet<>();

@@ -4,7 +4,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ScoreBoard {
-    private static Map<String,Integer> scoreMap = new HashMap<>();
+    private static Map<String,Integer> scoreMap;
+    static {
+
+        //temporarily values
+        scoreMap = new HashMap<>();
+        scoreMap.put("Aaaa", 2);
+        scoreMap.put("Bbbbb", 1);
+        scoreMap.put("Cc", 10);
+        scoreMap.put("Dddd", 1);
+    }
+
 
     public static void addScore(String playerName, int wins) {
         if (scoreMap.containsKey(playerName)) {

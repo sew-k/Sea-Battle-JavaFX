@@ -307,15 +307,16 @@ public class GameProcessor {
 
     public void playerWinGame(Player winner) {
         ScoreBoard.addScore(winner.getName(), winner.getScore());
+
         Printer printer = new Printer();
         printer.printWinner(winner);
     }
 
-    public void processGame() {
-        printer.titlePrinter();
-        printer.optionsPrinter(menu);
-        menu.selectOption();
-    }
+//    public void processGame() {
+//        printer.titlePrinter();
+//        printer.optionsPrinter(menu);
+//        menu.selectOption();
+//    }
     public void processGameFX(Stage primaryStage) {
         Drawer drawer = new Drawer();
         try {
