@@ -39,14 +39,8 @@ public class GameProcessor {
         this.drawer = new Drawer();
     }
 
-    public GameProcessor(Menu menu, Printer printer, Keyboard keyboard, PlayerTurnOptions playerTurnOptions) {
-        this.playerTurnOptions = playerTurnOptions;
-        this.menu = menu;
-        this.printer = printer;
-        this.keyboard = keyboard;
-    }
-
     public void exitGameFx(Stage primaryStage) {
+        continueGame = false;
         primaryStage.close();
     }
     public Player getPlayerOneFromPlayerSettingsFx(PlayerSettings playerSettings) {
@@ -75,16 +69,14 @@ public class GameProcessor {
         } else return null;
     }
     public void startGameFx(Stage primaryStage) {
+        continueGame = true;
 
         if (checkIfPlayersSetFx()) {
             setCurrentPlayerFx(playerOne);
-            System.out.println("checking is playerOne set as current: " + playerOne.equals(currentPlayer));
-            System.out.println("checking is playerTwo set as waiting: " + playerTwo.equals(waitingPlayer));
 
             if (checkIfPlayersShipsAllSetFx()) {
                 processTheBattleFx(primaryStage, playerOne, playerTwo);
             }
-
         } else {
             processGameFX(primaryStage);
         }
@@ -94,14 +86,14 @@ public class GameProcessor {
         playerOne = getPlayerOneFromPlayerSettingsFx(playerSettings);
         playerTwo = getPlayerTwoFromPlayerSettingsFx(playerSettings);
 
-        if (!ComputerPlayer.class.isInstance(playerOne)) {
+        if ((!ComputerPlayer.class.isInstance(playerOne)) && (continueGame)) {
             drawer.askAndSetPlayerName(playerOne, "ONE");
         }
-        if (!ComputerPlayer.class.isInstance(playerTwo)) {
+        if ((playerOne.getName() != null) && (!ComputerPlayer.class.isInstance(playerTwo)) && (continueGame)) {
             drawer.askAndSetPlayerName(playerTwo, "TWO");
         }
 
-        if (playerOne.getName() != null && playerTwo.getName() != null && playerOne.getName() != "" && playerTwo.getName() != "") {
+        if (playerOne.getName() != null && playerTwo.getName() != null && playerOne.getName() != "" && playerTwo.getName() != ""  && (continueGame)) {
             return true;
         } else {
             return false;
@@ -110,42 +102,21 @@ public class GameProcessor {
 
     public boolean checkIfPlayersShipsAllSetFx() {
         setCurrentPlayerFx(playerOne);
-        Stage stage1 = new Stage();
-
-//        if (!ComputerPlayer.class.isInstance(playerOne)) {
-//            drawer.drawPlayerBoardForShipsSetUp(stage1, playerOne);
-//        } else {
-//            playerOne.shipsSetUp();
-//        }
         playerOne.shipsSetUp();
 
         if (playerOne.isAllShipsSet()) {
             setCurrentPlayerFx(playerTwo);
-//            stage1.close();
-//            setCurrentPlayerFx(playerTwo);
-//            Stage stage2 = new Stage();
-//
-//            if (!ComputerPlayer.class.isInstance(playerTwo)) {
-//                drawer.drawPlayerBoardForShipsSetUp(stage2, playerTwo);
-//            } else {
-//                playerTwo.shipsSetUp();
-//            }
-//            if (playerTwo.isAllShipsSet()) {
-//                stage2.close();
-//            }
             playerTwo.shipsSetUp();
         }
 
         if (playerOne.isAllShipsSet() && playerTwo.isAllShipsSet()) {
-            System.out.println("checkIfPlayersShipsAllSet(): TRUE " + playerOne.getName());
-            System.out.println("checkIfPlayersShipsAllSet(): TRUE " + playerTwo.getName());
             return true;
         } else {
-            System.out.println("checkIfPlayersShipsAllSet(): FALSE");
             return false;
         }
     }
     public void processTheBattleFx(Stage primaryStage, Player playerOne, Player playerTwo) {
+        setCurrentPlayerFx(playerOne);
         boolean battleEnd = false;
         while (!battleEnd) {
             if (!singleRoundProcessorFx(primaryStage, playerOne, playerTwo)) {
@@ -157,44 +128,37 @@ public class GameProcessor {
 
     public boolean singleRoundProcessorFx(Stage primaryStage, Player playerOne, Player playerTwo) {
         if (continueGame) {
-            setCurrentPlayerFx(playerOne);
             singleTurnProcessorFx(primaryStage, currentPlayer, waitingPlayer);
             if (continueGame) {
-                setCurrentPlayerFx(playerTwo);
                 singleTurnProcessorFx(primaryStage, currentPlayer, waitingPlayer);
             } else {
                 return false;
+            }
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean singleTurnProcessorFx(Stage primaryStage, Player attacker, Player defender) {
+
+        System.out.println("processing turn for player " + attacker.getName());
+        if (continueGame) {
+            if (PlayerSettings.getCurrentPlayerSettings() == 0) {
+                if (ComputerPlayer.class.isInstance(attacker)) {
+                    singleShotProcessor(attacker, defender);
+                    endPlayerTurnFx(attacker);
+                } else {
+                    drawer.drawPlayersBoardsForProcessTheBattle(attacker, defender);
+                }
+
+            } else if (PlayerSettings.getCurrentPlayerSettings() == 2) {
+                drawer.drawGetReadyWindowForPlayer(attacker);
             }
             return true;
         } else {
             return false;
         }
-    }
-
-
-    public boolean singleTurnProcessorFx(Stage primaryStage, Player currentPlayer, Player otherPlayer) {
-
-        System.out.println("processing turn for player " + currentPlayer.getName());
-
-        if (ComputerPlayer.class.isInstance(currentPlayer)) {
-            singleShotProcessor(currentPlayer, otherPlayer);
-            if (winnerOfBattleCheck(currentPlayer, otherPlayer) != null) {
-                return false;
-            }
-        } else {
-            if (PlayerSettings.getCurrentPlayerSettings() == 2) {
-                drawer.drawGetReadyWindowForPlayer(currentPlayer);
-            } else {
-                drawer.drawPlayersBoardsForProcessTheBattle(playerOne, playerTwo);
-            }
-
-            //drawer.drawBoardForPlayerTurn(getPlayerOne(), getPlayerTwo());
-            if (winnerOfBattleCheck(currentPlayer, otherPlayer) != null) {
-                continueGame = false;
-                return false;
-            }
-        }
-        return false;
     }
 
     public void singleShotProcessor(Player attacker, Player defender) {
@@ -221,34 +185,12 @@ public class GameProcessor {
             }
         }
         printer.hostileBoardDrawer(attacker, defender);
-
-        Player winner;
-        Player loser = null;
-        winner = winnerOfBattleCheck(attacker, defender);
-        if (winner != null) {
-            winner.setScore(1);
-            if (winner.equals(attacker)) {
-                loser = defender;
-            }
-            printer.playersBoardDrawer(loser);
-            playerWinGame(winner);
-        } else {
-            if (currentPlayer.equals(playerOne)) {
-                currentPlayer = playerTwo;
-                System.out.println("changed current player to player two");
-            } else if (currentPlayer.equals(playerTwo)) {
-                currentPlayer = playerOne;
-                System.out.println("changed current player to player one");
-            }
-        }
-
     }
 
     public void singleShotProcessorFx(Player attacker, Player defender, String target) {
         Printer printer = new Printer();
         Validator validator = new Validator();
         Board board = new Board();
-
         printer.hostileBoardDrawer(attacker, defender);
 
         if (validator.validateIsTargetOnBoard(target, board)) {
@@ -262,64 +204,33 @@ public class GameProcessor {
             } else {
                 printer.targetOutOfBoardMessage();
             }
-
-        Player winner;
-        Player loser = null;
-        winner = winnerOfBattleCheck(attacker, defender);
-        if (winner != null) {
-            winner.setScore(1);
-            if (winner.equals(attacker)) {
-                loser = defender;
-            }
-
-            printer.playersBoardDrawer(loser);
-            playerWinGame(winner);
+    }
+    public void endPlayerTurnFx(Player player) {
+        Player winner = winnerOfBattleCheck(currentPlayer, waitingPlayer);
+        if (winner == null) {
+            setCurrentPlayerFx(waitingPlayer);
         } else {
-            endPlayerTurnFx(currentPlayer);
-//            if (currentPlayer.equals(playerOne)) {
-//                currentPlayer = playerTwo;
-//                System.out.println("changed current player to player two");
-//            } else if (currentPlayer.equals(playerTwo)) {
-//                currentPlayer = playerOne;
-//                System.out.println("changed current player to player one");
-//            }
+            playerWinGameFx(winner);
         }
     }
-
-    public void endPlayerTurnFx(Player currentPlayer) {
-        if (currentPlayer.equals(playerOne)) {
-            setCurrentPlayerFx(playerTwo);
-            System.out.println("changed current player to player two");
-        } else if (currentPlayer.equals(playerTwo)) {
-            setCurrentPlayerFx(playerOne);
-            System.out.println("changed current player to player one");
-        }
-    }
-
     public Player winnerOfBattleCheck(Player attacker, Player defender) {
-
         boolean defenderAllShipsSunk = defender.getShips().stream()
                 .allMatch(ship -> ship.getStatusOnBoard().containsValue("sink"));
 
         if (defenderAllShipsSunk) {
+            attacker.setScore(1);
+            continueGame = false;
             return attacker;
         } else {
             return null;
         }
     }
-
-    public void playerWinGame(Player winner) {
+    public void playerWinGameFx(Player winner) {
         ScoreBoard.addScore(winner.getName(), winner.getScore());
-
         Printer printer = new Printer();
         printer.printWinner(winner);
+        drawer.drawPlayerWinGame(winner);
     }
-
-//    public void processGame() {
-//        printer.titlePrinter();
-//        printer.optionsPrinter(menu);
-//        menu.selectOption();
-//    }
     public void processGameFX(Stage primaryStage) {
         Drawer drawer = new Drawer();
         try {
@@ -328,19 +239,15 @@ public class GameProcessor {
 
         }
     }
-
     public Player getPlayerOne() {
         return playerOne;
     }
-
     public void setPlayerOne(Player playerOne) {
         this.playerOne = playerOne;
     }
-
     public Player getPlayerTwo() {
         return playerTwo;
     }
-
     public void setPlayerTwo(Player playerTwo) {
         this.playerTwo = playerTwo;
     }

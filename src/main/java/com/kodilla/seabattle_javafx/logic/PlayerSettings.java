@@ -14,7 +14,7 @@ public class PlayerSettings extends Options {
             "Player vs Computer (hard)",             //TODO - implementation of hard-version of ComputerPlayer
             "Player vs Player (hot seat)",
             "Computer vs Computer"));                //TODO - implementation different names or numerators for both Cpu-players
-    private static int currentPlayerSettings = 0;
+    private static int currentPlayerSettings = 2;
 
     @Override
     public String getOptionsTitle() {

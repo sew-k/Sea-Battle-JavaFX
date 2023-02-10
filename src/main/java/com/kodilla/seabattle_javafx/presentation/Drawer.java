@@ -28,11 +28,55 @@ public class Drawer {
 
     private static String message;
     private static int gridSize = 40;
+    private static boolean turnEnabled;
 
     public void drawScene(Stage primaryStage, Scene scene) {
         primaryStage.setTitle("Sea Battle Game");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    public void askAndSetPlayerName(Player player, String numberOfPlayer) {
+        Stage stage = new Stage();
+        Label label = new Label("Player " + numberOfPlayer + " - please enter your name:");
+        label.setStyle("-fx-font-size: 16");
+        TextField name = new TextField();
+        name.setMaxSize(260, 20);
+        Button confirmBt = new Button("Confirm");
+        confirmBt.setMinSize(130,30);
+        confirmBt.isDefaultButton();
+        confirmBt.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                player.setName(name.getText());
+                System.out.println(name.getText());
+                System.out.println("PLAYER SET NAME: " + player.getName());
+                stage.close();
+            }
+        });
+        Button cancelBt = new Button("Cancel/exit");
+        cancelBt.setMinSize(130,30);
+        cancelBt.isCancelButton();
+        cancelBt.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                GameProcessor.continueGame = false;
+                stage.close();
+            }
+        });
+        VBox vbox = new VBox();
+        VBox playerNamevbox = new VBox();
+        playerNamevbox.setAlignment(Pos.CENTER);
+        playerNamevbox.setPrefSize(300,100);
+        HBox buttonsHBox = new HBox();
+        playerNamevbox.getChildren().addAll(label, name);
+        buttonsHBox.getChildren().addAll(confirmBt,cancelBt);
+        buttonsHBox.setPrefSize(300, 60);
+        buttonsHBox.setAlignment(Pos.CENTER);
+        vbox.getChildren().addAll(playerNamevbox,buttonsHBox);
+        Scene scene = new Scene(vbox);
+        stage.setScene(scene);
+        stage.showAndWait();
     }
 
     public Scene drawMenu(Options options, Stage primaryStage) throws IOException {
@@ -43,7 +87,7 @@ public class Drawer {
         imageView.setPreserveRatio(true);
         root.getChildren().add(imageView);
         root.setAlignment(Pos.BASELINE_CENTER);
-        Scene scene = new Scene(root, 320, 380);
+        Scene scene = new Scene(root, 320, 360);
         List<String> optionsList = options.getOptions();
 
         for (String option : optionsList) {
@@ -60,10 +104,13 @@ public class Drawer {
         return scene;
     }
 
-    public void drawScoreBoard() {                          //TODO - to complete
+    public void drawScoreBoard() {
         Stage stage = new Stage();
         Label scoreBoardLabel = new Label("Score board");
-        scoreBoardLabel.setStyle("-fx-font-weight: bold;");
+        scoreBoardLabel.setMinWidth(300);
+        scoreBoardLabel.setMinHeight(60);
+        scoreBoardLabel.setStyle("-fx-font-size: 22;");
+        scoreBoardLabel.setAlignment(Pos.CENTER);
 
         GridPane scoreBoardGrid = new GridPane();
         List<Map.Entry<String, Integer>> scoreBoardListSorted = new ArrayList<>(ScoreBoard.getScoreMap().entrySet().stream().toList());
@@ -77,10 +124,16 @@ public class Drawer {
             scoreBoardGrid.add(new Label(score), 2, j);
             j++;
         }
+        scoreBoardGrid.setAlignment(Pos.CENTER);
+        scoreBoardGrid.setStyle("-fx-border-color: gray; -fx-font-size: 14");
 
         Button okButton = new Button("Ok");
         okButton.setMinSize(130,30);
         okButton.setAlignment(Pos.CENTER);
+        HBox buttonHBox = new HBox(okButton);
+        buttonHBox.setMinHeight(60);
+        buttonHBox.setMinWidth(300);
+        buttonHBox.setAlignment(Pos.CENTER);
         okButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -88,20 +141,27 @@ public class Drawer {
             }
         });
         BorderPane borderPane = new BorderPane();
+        VBox vBox = new VBox(scoreBoardLabel, scoreBoardGrid);
         borderPane.setTop(scoreBoardLabel);
-        borderPane.setCenter(scoreBoardGrid);
-        borderPane.setBottom(okButton);
+        borderPane.setCenter(vBox);
+        borderPane.setBottom(buttonHBox);
         Scene scene = new Scene(borderPane);
         stage.setScene(scene);
         stage.showAndWait();
     }
-
     public void  drawPlayerBoardForShipsSetUp(Stage primaryStage, Player player) {
-        Label text = new Label("\nPlayer '"+ player.getName() +" board \n");
         BorderPane borderPane = new BorderPane();
         VBox board = new VBox();
         Board playerBoard = new Board();
         GridPane gridPaneBoard = new GridPane();
+
+        int actualBoardWidth = (playerBoard.getColumns().size() + 2) * gridSize;
+        int actualBoardHeight = (playerBoard.getRows().size() + 2) * gridSize;
+
+        Label textLabel = new Label("\nPlayer '"+ player.getName() +"' game board \n");
+        textLabel.setPrefSize((Board.getColumnsCount() + 2) * gridSize + 2, 60);
+        textLabel.setAlignment(Pos.CENTER);
+        textLabel.setStyle("-fx-border-color: gray; -fx-font-size: 18");
 
         for (int column = 0; column < playerBoard.getColumns().size(); column++) {
             Label columLabel = new Label(playerBoard.getColumns().get(column));
@@ -158,30 +218,26 @@ public class Drawer {
                 gridPaneBoard.add(fieldBt,column + 1,row + 1);
             }
         }
-//        Button nextShipButton = new Button("Set next ship");
-//        nextShipButton.setMinSize(130,30);
-//        nextShipButton.setOnAction(new EventHandler<ActionEvent>() {
-//            @Override
-//            public void handle(ActionEvent event) {
-//                primaryStage.close();
-//                //drawPlayerBoardForShipsSetUp(new Stage(), GameProcessor.currentPlayer);
-//            }
-//        });
-//        HBox buttonsHBox = new HBox(nextShipButton);
+
+        BorderPane boardForShipSetup = new BorderPane(gridPaneBoard);
+        boardForShipSetup.setPrefSize(actualBoardWidth, actualBoardHeight);
+        boardForShipSetup.setStyle("-fx-border-color: gray");
         Pane shipsConfigurationPane = drawShipsConfigurationPane();
-        board.getChildren().addAll(gridPaneBoard, shipsConfigurationPane);
+        board.getChildren().addAll(boardForShipSetup, shipsConfigurationPane);
         borderPane.setCenter(board);
-        borderPane.setTop(text);
-//        borderPane.setBottom(buttonsHBox);
+        borderPane.setTop(textLabel);
         Scene scene = new Scene(borderPane);
         primaryStage.setScene(scene);
         primaryStage.showAndWait();
     }
-
     public Pane drawShipsConfigurationPane() {
-        Label text = new Label("Select ship to set on board\n");
+        Label textLabel = new Label("Select ship to set on board\n");
+        textLabel.setStyle("-fx-font-size: 18; -fx-text-alignment: CENTER;");
+        textLabel.setMinHeight(gridSize * 1.5);
+        textLabel.setPrefSize((Board.getColumnsCount() + 2) * gridSize, gridSize * 1.5);
+        textLabel.setAlignment(Pos.CENTER);
         BorderPane borderPane = new BorderPane();
-        message = " - please, select ship to set on board";
+        //message = " - please, select ship to set on board";
         GridPane gridPaneShips = new GridPane();
         Player currentPlayer = GameProcessor.currentPlayer;
 
@@ -206,18 +262,26 @@ public class Drawer {
             buttonAsShip.setMinSize(currentButtonWidth, buttonHeight);
             gridPaneShips.add(buttonAsShip,0, i);
             Label shipsToSet = new Label(" - number to set: " + entry.getValue());
+            shipsToSet.setStyle("-fx-font-size: 14");
             gridPaneShips.add(shipsToSet,1 , i);
             i++;
         }
-        Label terminal = new Label(currentPlayer.getName() + message);
-        borderPane.setTop(text);
-        borderPane.setBottom(terminal);
+        Label marginLabelLeft = new Label();
+        marginLabelLeft.setPrefSize(gridSize,gridSize);
+        Label marginLabelBottom = new Label();
+        marginLabelBottom.setPrefSize(gridSize,gridSize);
+        borderPane.setLeft(marginLabelLeft);
+        borderPane.setTop(textLabel);
+        borderPane.setBottom(marginLabelBottom);
         borderPane.setCenter(gridPaneShips);
+        borderPane.setStyle("-fx-border-color: gray");
         return borderPane;
     }
     public void drawGetReadyWindowForPlayer(Player currentPlayer) {
         Stage stage = new Stage();
-        Label text = new Label("Player '" + currentPlayer.getName() + "', get ready for your turn!");
+        Label textLabel = new Label("Player '" + currentPlayer.getName() + "', get ready for your turn!");
+        textLabel.setStyle("-fx-font-size: 18; -fx-text-alignment: CENTER;");
+        textLabel.setMinHeight(gridSize * 1.5);
         Button okButton = new Button("Ready!");
         okButton.setMinSize(130,30);
         okButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -238,27 +302,26 @@ public class Drawer {
         });
         HBox buttonsHbox = new HBox(okButton,giveUpButton);
         buttonsHbox.setAlignment(Pos.CENTER);
+        buttonsHbox.setMinWidth(300);
+        buttonsHbox.setMinHeight(80);
         BorderPane borderPane = new BorderPane();
-        borderPane.setCenter(text);
+        borderPane.setCenter(textLabel);
         borderPane.setBottom(buttonsHbox);
         Scene scene = new Scene(borderPane);
         stage.setScene(scene);
         stage.showAndWait();
     }
     public void drawPlayersBoardsForProcessTheBattle(Player playerOne, Player playerTwo) {
+        GameProcessor gameProcessor = new GameProcessor();
         Stage primaryStage = new Stage();
-        Label text = new Label("This is your battlefield...\n");
+        turnEnabled = true;
         Button endTurnButton = new Button("End turn");
         endTurnButton.setMinSize(130,30);
         endTurnButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                GameProcessor gameProcessor = new GameProcessor();
+                gameProcessor.endPlayerTurnFx(GameProcessor.currentPlayer);
                 primaryStage.close();
-                if (gameProcessor.winnerOfBattleCheck(GameProcessor.currentPlayer, GameProcessor.waitingPlayer) != null) {
-                    Drawer drawer = new Drawer();
-                    drawer.drawPlayerWinGame(gameProcessor.winnerOfBattleCheck(GameProcessor.currentPlayer, GameProcessor.waitingPlayer));
-                }
             }
         });
         Button giveUpAndExitGame = new Button("Exit game");
@@ -266,8 +329,7 @@ public class Drawer {
         giveUpAndExitGame.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                GameProcessor.continueGame = false;
-                primaryStage.close();
+                gameProcessor.exitGameFx(primaryStage);
             }
         });
         BorderPane borderPane = new BorderPane();
@@ -276,8 +338,11 @@ public class Drawer {
         boardsHBox.getChildren().add(drawPlayerBoardToLayout(primaryStage, playerTwo));
         HBox buttonsHbox = new HBox(endTurnButton, giveUpAndExitGame);
         buttonsHbox.setAlignment(Pos.CENTER);
+        buttonsHbox.setMinHeight(80);
         borderPane.setCenter(boardsHBox);
-        borderPane.setTop(text);
+        Label marginLabelRight = new Label();
+        marginLabelRight.setPrefSize(gridSize, boardsHBox.getHeight());
+        borderPane.setRight(marginLabelRight);
         borderPane.setBottom(buttonsHbox);
         Scene scene = new Scene(borderPane);
         primaryStage.setScene(scene);
@@ -285,8 +350,13 @@ public class Drawer {
     }
     public Pane drawPlayerBoardToLayout(Stage stage, Player player) {
         Board playerBoard = new Board();
-        Label text = new Label("\nPlayer '"+ player.getName() +" board \n");
+        Label textLabel = new Label("\nPlayer '"+ player.getName() +"' board \n");
+        textLabel.setStyle("-fx-font-size: 18; -fx-text-alignment: CENTER;");
+        textLabel.setMinHeight(gridSize * 1.5);
+        textLabel.setMinWidth((gridSize) * Board.getColumnsCount() + gridSize);
+        textLabel.setAlignment(Pos.CENTER);
         GridPane gridPaneBoard = new GridPane();
+        VBox vBox = new VBox();
 
         for (int column = 0; column < playerBoard.getColumns().size(); column++) {
             Label columLabel = new Label(playerBoard.getColumns().get(column));
@@ -304,7 +374,7 @@ public class Drawer {
                 String fieldCoordinates = playerBoard.getColumns().get(column) + playerBoard.getRows().get(row);
 
                 if (player.equals(GameProcessor.waitingPlayer)) {
-                    Button field = setButtonForAimOnDefenderPlayerBoard(player, fieldCoordinates, fieldCoordinates);
+                    Button field = setButtonForAimOnDefenderPlayerBoard(vBox, player, fieldCoordinates, fieldCoordinates);
                     field.setMinSize(gridSize, gridSize);
                     field.setMaxSize(gridSize, gridSize);
                     Label labelField = setLabelFieldForAttackerPlayerBoard(GameProcessor.waitingPlayer, fieldCoordinates);
@@ -323,11 +393,11 @@ public class Drawer {
                 }
             }
         }
-        //gridPaneBoard.setStyle("-fx-border-color: grey;");
-        VBox vbox = new VBox(text,gridPaneBoard);
-        return vbox;
+        vBox.getChildren().addAll(textLabel, gridPaneBoard);
+        Pane resultPane = new StackPane(vBox);
+        return resultPane;
     }
-    public Button setButtonForAimOnDefenderPlayerBoard(Player defender, String buttonCoordinates, String buttonLabel) {
+    public Button setButtonForAimOnDefenderPlayerBoard(Pane pane, Player defender, String buttonCoordinates, String buttonLabel) {
         Button fieldButton = new Button(buttonLabel);
         String isFieldAnyShipStatus = " ";
 
@@ -366,9 +436,22 @@ public class Drawer {
         fieldButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                fieldButton.setVisible(false);
-                GameProcessor gameProcessor = new GameProcessor();
-                gameProcessor.singleShotProcessorFx(GameProcessor.currentPlayer, GameProcessor.waitingPlayer, buttonCoordinates);
+                if (turnEnabled) {
+                    fieldButton.setVisible(false);
+                    GameProcessor gameProcessor = new GameProcessor();
+                    gameProcessor.singleShotProcessorFx(GameProcessor.currentPlayer, GameProcessor.waitingPlayer, buttonCoordinates);
+                    turnEnabled = false;
+                    if (gameProcessor.winnerOfBattleCheck(GameProcessor.currentPlayer, GameProcessor.waitingPlayer) != null) {
+                        pane.setDisable(true);
+                    }
+
+                } else {
+                    drawMessageForPlayer(GameProcessor.currentPlayer, "Your turn has ended!");
+                    GameProcessor gameProcessor = new GameProcessor();
+                    if (gameProcessor.winnerOfBattleCheck(GameProcessor.currentPlayer, GameProcessor.waitingPlayer) != null) {
+                        pane.setDisable(true);
+                    }
+                }
             }
         });
         return fieldButton;
@@ -408,85 +491,11 @@ public class Drawer {
         fieldLabel.setStyle("-fx-border-color: grey;");
         return fieldLabel;
     }
-    public void askPlayerForSelectShipToSetWindow(Player player) {
-        Stage stage = new Stage();
-        Label text = new Label("Select ship to set on board\n");
-        BorderPane borderPane = new BorderPane();
-        message = " - please, select ship to set on board";
-        GridPane gridPaneShips = new GridPane();
-        Player currentPlayer = GameProcessor.currentPlayer;
-        Map<Integer,Integer> shipCountSettings = currentPlayer.getShipsToSet();
-        int i = 0;
-
-        for (Map.Entry<Integer,Integer> entry : shipCountSettings.entrySet()) {
-            Button buttonAsShip = new Button();
-            buttonAsShip.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    Player player = GameProcessor.currentPlayer;
-                    player.setCurrentShip(entry.getKey());
-                    message = " - you select ship - size: " + currentPlayer.getCurrentShip() + " to set on board";
-                    System.out.println("Current player: " + currentPlayer);
-                    System.out.println("Current ship: " + currentPlayer.getCurrentShip());
-                    stage.close();
-                }
-            });
-            double buttonWidth = 30;
-            double buttonHeight = 30;
-            double currentButtonWidth = buttonWidth * entry.getKey();
-            buttonAsShip.setMinSize(currentButtonWidth, buttonHeight);
-            gridPaneShips.add(buttonAsShip,0, i);
-            Label shipsToSet = new Label(" - number to set: " + entry.getValue());
-            gridPaneShips.add(shipsToSet,1 , i);
-            i++;
-        }
-        Label terminal = new Label(currentPlayer.getName() + message);
-        borderPane.setTop(text);
-        borderPane.setBottom(terminal);
-        borderPane.setCenter(gridPaneShips);
-        Scene scene = new Scene(borderPane);
-        stage.setScene(scene);
-        stage.showAndWait();
-    }
-    public void askAndSetPlayerName(Player player, String numberOfPlayer) {
-        Stage stage = new Stage();
-        Label label = new Label("Player " + numberOfPlayer + " - please enter your name: ");
-        TextField name = new TextField();
-        Button confirmBt = new Button("Confirm");
-        confirmBt.setMinSize(130,30);
-        confirmBt.isDefaultButton();
-        confirmBt.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                player.setName(name.getText());
-                System.out.println(name.getText());
-                System.out.println("PLAYER SET NAME: " + player.getName());
-                stage.close();
-            }
-        });
-        Button cancelBt = new Button("Cancel/exit");
-        cancelBt.setMinSize(130,30);
-        cancelBt.isCancelButton();
-        cancelBt.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                stage.close();
-            }
-        });
-        VBox vbox = new VBox();
-        HBox hbox1 = new HBox();
-        HBox hbox2 = new HBox();
-        hbox1.getChildren().addAll(label, name);
-        hbox2.getChildren().addAll(confirmBt,cancelBt);
-        hbox2.setAlignment(Pos.CENTER);
-        vbox.getChildren().addAll(hbox1,hbox2);
-        Scene scene = new Scene(vbox);
-        stage.setScene(scene);
-        stage.showAndWait();
-    }
     public void drawMessageForPlayer(Player player, String message) {
         Stage stage = new Stage();
-        Label label = new Label("Player '" + player.getName() + "': " + message);
+        Label textLabel = new Label("Player '" + player.getName() + "': " + message);
+        textLabel.setStyle("-fx-font-size: 18; -fx-text-alignment: CENTER;");
+        textLabel.setMinHeight(gridSize * 1.5);
         Button confirmBt = new Button("OK");
         confirmBt.setMinSize(130,30);
         confirmBt.isDefaultButton();
@@ -496,51 +505,27 @@ public class Drawer {
                 stage.close();
             }
         });
-
         VBox vBox = new VBox();
-        HBox hBox = new HBox();
-        hBox.getChildren().addAll(confirmBt);
-        hBox.setAlignment(Pos.CENTER);
-        vBox.getChildren().addAll(label, hBox);
+        HBox buttonHBox = new HBox();
+        buttonHBox.getChildren().addAll(confirmBt);
+        buttonHBox.setAlignment(Pos.CENTER);
+        buttonHBox.setMinHeight(80);
+        buttonHBox.setMinWidth(300);
+        vBox.getChildren().addAll(textLabel, buttonHBox);
         vBox.setAlignment(Pos.CENTER);
         Scene scene = new Scene(vBox);
         stage.setScene(scene);
-        stage.showAndWait();
-    }
-    public void drawDialogMessageForPlayer(Player player, Pane pane) {
-        Stage stage = new Stage();
-        Label label = new Label("Player '" + player.getName());
-        Button confirmBt = new Button("OK");
-        confirmBt.setMinSize(130,30);
-        confirmBt.isDefaultButton();
-        confirmBt.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                System.out.println("PLAYER " + player.getName() + "SET : OK");
-                stage.close();
-            }
-        });
-        Button cancelBt = new Button("Cancel/ exit game");
-        cancelBt.setMinSize(130,30);
-        cancelBt.isCancelButton();
-        cancelBt.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                stage.close();
-                GameProcessor.continueGame = false;
-            }
-        });
-        VBox vbox = new VBox();
-        HBox hbox1 = new HBox();
-        hbox1.getChildren().addAll(confirmBt,cancelBt);
-        vbox.getChildren().addAll(label, pane, hbox1);
-        Scene scene = new Scene(vbox);
-        stage.setScene(scene);
+        stage.setAlwaysOnTop(true);
         stage.showAndWait();
     }
     public void drawPlayerWinGame(Player winner) {
         Stage stage = new Stage();
-        Label label = new Label("Player '" + winner.getName() + "' win game!");
+        Label textLabel = new Label("Player '" + winner.getName() + "' win game!");
+        textLabel.setStyle("-fx-font-size: 18; -fx-text-alignment: CENTER;");
+        textLabel.setMinHeight(gridSize * 1.5);
+        textLabel.setAlignment(Pos.CENTER);
+        textLabel.setPrefSize(300,100);
+        textLabel.setStyle("-fx-font-size: 18; -fx-text-alignment: CENTER");
         Button confirmBt = new Button("OK");
         confirmBt.setMinSize(130,30);
         confirmBt.isDefaultButton();
@@ -552,8 +537,13 @@ public class Drawer {
         });
 
         VBox vbox = new VBox();
+        HBox buttonHBox = new HBox(confirmBt);
+        buttonHBox.setMinHeight(80);
+        buttonHBox.setMinWidth(300);
         vbox.setAlignment(Pos.CENTER);
-        vbox.getChildren().addAll(label, confirmBt);
+        buttonHBox.setAlignment(Pos.CENTER);
+        vbox.getChildren().addAll(textLabel, buttonHBox);
+        vbox.setPrefSize(300,100);
         Scene scene = new Scene(vbox);
         stage.setScene(scene);
         stage.showAndWait();
@@ -562,13 +552,10 @@ public class Drawer {
         Settings settings = new Settings();
         Label titleSettingsLabel = new Label(settings.getOptionsTitle());
         List<String> settingsList = new ArrayList<>(settings.getOptions());
-
         PlayerSettings playerSettings = new PlayerSettings();
         Label titlePlayerSettingsLabel = new Label(playerSettings.getOptionsTitle());
         List<String> playerSettingsList = new ArrayList<>(playerSettings.getOptions());
-
         Stage stage = new Stage();
-
         Label playerSettingsLabel = new Label(settings.getOptions().get(1));
         playerSettingsLabel.setStyle("-fx-font-weight: bold;");
         RadioButton pVsCn = new RadioButton(playerSettings.getOptions().get(0));
@@ -580,6 +567,7 @@ public class Drawer {
         pVsp.setId(Integer.toString(2));
         RadioButton cVsC = new RadioButton(playerSettings.getOptions().get(3));
         cVsC.setId(Integer.toString(3));
+        cVsC.setDisable(true);
         ToggleGroup playerSettingsRadioButtonsGroup = new ToggleGroup();
         pVsCn.setToggleGroup(playerSettingsRadioButtonsGroup);
         pVsCh.setToggleGroup(playerSettingsRadioButtonsGroup);
@@ -598,16 +586,12 @@ public class Drawer {
 
         VBox playerSettingsVBox = new VBox(playerSettingsLabel, pVsCn, pVsCh, pVsp, cVsC);
         playerSettingsVBox.setStyle("-fx-border-color: grey;");
-
         Label shipCountSettingsLabel = new Label(settings.getOptions().get(0));
         shipCountSettingsLabel.setStyle("-fx-font-weight: bold;");
         Map<Integer, Integer> shipCountSettings = Settings.getShipCountSettings();
         BorderPane shipCountSettingsBorderPane = new BorderPane();
         GridPane gridPaneShips = new GridPane();
-
         Map<Integer,Integer> temporaryShipCountSettings = Settings.getShipCountSettings();
-
-
         List<TextField> textFieldList = new ArrayList<>();
         int i = 0;
         for (Map.Entry<Integer,Integer> entry : temporaryShipCountSettings.entrySet()) {
@@ -618,7 +602,6 @@ public class Drawer {
             labelAsShip.setMinSize(currentLabelAsShipWidth, labelAsShipHeight);
             labelAsShip.setStyle("-fx-background-color: white;");
             labelAsShip.setStyle("-fx-border-color: grey");
-
             TextField textField = new TextField(Integer.toString(entry.getValue()));
             textField.setAccessibleText(Integer.toString(entry.getValue()));
             entry.setValue(Integer.parseInt(textField.getAccessibleText()));
@@ -634,7 +617,6 @@ public class Drawer {
         shipCountSettingsBorderPane.setTop(shipCountSettingsLabel);
         shipCountSettingsBorderPane.setCenter(gridPaneShips);
         shipCountSettingsBorderPane.setStyle("-fx-border-color: grey;");
-
         Label boardSizeLabel = new Label(settings.getOptions().get(2));
         boardSizeLabel.setStyle("-fx-font-weight: bold;");
         TextField heightTextField = new TextField(Integer.toString(Board.getRowsCount()));
@@ -647,14 +629,12 @@ public class Drawer {
         HBox boardWidthHBox = new HBox(new Label("Width: "), widthTextField);
         VBox boardSizeVBox = new VBox(boardSizeLabel, boardHeightHBox, boardWidthHBox);
         boardSizeVBox.setStyle("-fx-border-color: grey;");
-
         Label cheatModeLabel = new Label(settings.getOptions().get(3));
         cheatModeLabel.setStyle("-fx-font-weight: bold;");
         RadioButton cheatModeRadioButton = new RadioButton("Cheat mode [on/off]");
         cheatModeRadioButton.setSelected(settings.isCheatMode());
         VBox cheatModeVBox = new VBox(cheatModeLabel, cheatModeRadioButton);
         cheatModeVBox.setStyle("-fx-border-color: grey;");
-
         Button acceptButton = new Button("Accept & Save");
         acceptButton.setMinSize(130,30);
         acceptButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -669,12 +649,9 @@ public class Drawer {
                     temporaryShipCountSettings.replace(Integer.parseInt(textFieldList.get(j).getId()), Integer.parseInt(textFieldList.get(j).getText()));
                 }
                 Settings.setShipCountSettings(temporaryShipCountSettings);
-
                 int selected = playerSettingsRadioButtonsGroup.getToggles().indexOf(playerSettingsRadioButtonsGroup.getSelectedToggle());
                 PlayerSettings.setCurrentPlayerSettings(selected);
-
                 Settings.setCheatMode(cheatModeRadioButton.isSelected());
-
                 stage.close();
             }
         });
@@ -689,6 +666,8 @@ public class Drawer {
         HBox buttonsHBox = new HBox(acceptButton, cancelButton);
         buttonsHBox.setAlignment(Pos.CENTER);
         buttonsHBox.setStyle("-fx-border-color: grey;");
+        buttonsHBox.setMinHeight(80);
+        buttonsHBox.setMinWidth(300);
         VBox vBox = new VBox();
         vBox.getChildren().addAll(playerSettingsVBox, shipCountSettingsBorderPane, boardSizeVBox, cheatModeVBox, buttonsHBox);
         vBox.setAlignment(Pos.CENTER);

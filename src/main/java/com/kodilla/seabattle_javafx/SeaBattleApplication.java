@@ -16,7 +16,9 @@ public class SeaBattleApplication extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
         GameProcessor gameProcessor = new GameProcessor();
+        primaryStage.setAlwaysOnTop(true);
         gameProcessor.processGameFX(primaryStage);
+        primaryStage.setAlwaysOnTop(false);
     }
 
     public static void main(String[] args) {
