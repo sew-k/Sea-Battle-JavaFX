@@ -7,7 +7,6 @@ import com.kodilla.seabattle_javafx.data.Ship;
 import java.util.Map;
 
 public class Validator {
-
     public boolean validateForOptions(String keys, Options options) {
         boolean result = false;
         if ("0123456789".contains(keys)) {
@@ -18,7 +17,6 @@ public class Validator {
         }
         return result;
     }
-
     public boolean validateForChangeSettings(String keys, Options options) {
         Settings settings = new Settings();
         if ((keys.equals(settings.getKeyForChangeSettings())) || (keys.equals(settings.getKeyForLeaveSettings()))) {
@@ -27,7 +25,6 @@ public class Validator {
             return false;
         }
     }
-
     public boolean validateIsTargetOnBoard(String target, Board board) {
         if ((target.length() == 2) &&
                 (board.getColumns().contains(Character.toString(target.charAt(0)))) &&
@@ -42,7 +39,6 @@ public class Validator {
             return false;
         }
     }
-
     public boolean validateIfFieldAlreadyChosen(String newField, Map<String,String> shipStatus, Player player) {
         boolean isFieldInThisShipAlready = shipStatus.entrySet().stream()
                 .anyMatch(en -> en.getKey().equals(newField));
@@ -55,7 +51,6 @@ public class Validator {
             return true;
         }
     }
-
     public boolean isFieldAvailable(String newField, Player player) {
         if (player.getAvailableFieldsOnBoard().equals(newField)) {
             return true;
@@ -63,7 +58,6 @@ public class Validator {
             return false;
         }
     }
-
     public boolean validateFieldToSetUpShip(String newField, Ship ship, Player player) {
         boolean checkIfFieldAlreadyChosen = player.getShips().stream()
                 .flatMap(ship1 -> ship1.getStatusOnBoard().entrySet().stream())

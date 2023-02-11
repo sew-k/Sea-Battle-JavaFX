@@ -4,19 +4,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Ship {
-
     private int size;
     private Map<String,String> statusOnBoard = new HashMap<>();
     private Set<String> bufferZone = new HashSet<>();
-
     public int getSize() {
         return size;
     }
-
     public Map<String, String> getStatusOnBoard() {
         return statusOnBoard;
     }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -29,7 +25,6 @@ public class Ship {
     }
     @Override
     public String toString() {
-
         String result = "";
         if (getSize() != getStatusOnBoard().size()) {
             String field = "?";
@@ -51,19 +46,15 @@ public class Ship {
         }
         return result;
     }
-
     public void setSize(int size) {
         this.size = size;
     }
-
     public void setStatusOnBoard(Map<String, String> statusOnBoard) {
         this.statusOnBoard = statusOnBoard;
     }
-
     public Set<String> getBufferZone() {
         return bufferZone;
     }
-
     public void setBufferZone() {
         Set<String> setOfFields = new HashSet<>();
         String row;
@@ -85,14 +76,12 @@ public class Ship {
 
         this.bufferZone = setOfFields;
     }
-
     @Override
     public int hashCode() {
         int result = size;
         result = 31 * result + (statusOnBoard != null ? statusOnBoard.hashCode() : 0);
         return result;
     }
-
     public void checkIfShipSink() {
         boolean shipSink = true;
         for (Map.Entry<String,String> entry : getStatusOnBoard().entrySet()) {

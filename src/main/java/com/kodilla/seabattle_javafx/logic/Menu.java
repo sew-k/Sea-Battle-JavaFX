@@ -11,7 +11,6 @@ import java.util.List;
 public class Menu extends Options {
     private final String optionsTitle = "Game Menu";
     private final List<String> options = new ArrayList<>(Arrays.asList("Start Game","Settings","Score Board","Exit"));
-
     public List<String> getOptions() {
         return options;
     }
@@ -19,13 +18,10 @@ public class Menu extends Options {
     public String getOptionsTitle() {
         return optionsTitle;
     }
-
     @Override
     public void selectOptionFx(Button button, Stage primaryStage) {
         Drawer drawer = new Drawer();
         GameProcessor gameProcessor = new GameProcessor();
-        Settings settings = new Settings();
-
         if (button.getText().equals(this.options.get(0))) {
             GameProcessor.continueGame = true;
             gameProcessor.startGameFx(primaryStage);

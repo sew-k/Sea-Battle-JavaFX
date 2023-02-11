@@ -177,11 +177,8 @@ public class ComputerPlayer extends Player {
                 }
             }
         }
-
         printer.printPlayerShips(this);
-
         setAllShipsSet(true);
-
         System.out.println("all ships set? : " + allShipsSet);
     }
 }

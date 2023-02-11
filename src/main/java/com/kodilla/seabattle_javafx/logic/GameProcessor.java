@@ -7,21 +7,18 @@ import com.kodilla.seabattle_javafx.presentation.Printer;
 import javafx.stage.Stage;
 
 public class GameProcessor {
-
     public static Player playerOne;
     public static Player playerTwo;
     private Printer printer;
     private Keyboard keyboard;
+    private Drawer drawer;
     public static boolean continueGame = true;
     public static Player currentPlayer;
     public static Player waitingPlayer;
-
     private Options menu = new Menu();
     private Options settings = new Settings();
     private Options playerSettings = new PlayerSettings();
     private Options playerTurnOptions;
-    private Drawer drawer;
-
     public void setCurrentPlayerFx(Player player) {
         currentPlayer = player;
         if (currentPlayer.equals(playerOne)) {
@@ -30,7 +27,6 @@ public class GameProcessor {
             waitingPlayer = playerOne;
         }
     }
-
     public GameProcessor() {
         this.playerTurnOptions = new PlayerTurnOptions();
         this.menu = new Menu();
@@ -38,7 +34,9 @@ public class GameProcessor {
         this.keyboard = new Keyboard();
         this.drawer = new Drawer();
     }
-
+    public GameProcessor(Drawer drawer) {
+        this.drawer = drawer;
+    }
     public void exitGameFx(Stage primaryStage) {
         continueGame = false;
         primaryStage.close();
@@ -99,7 +97,6 @@ public class GameProcessor {
             return false;
         }
     }
-
     public boolean checkIfPlayersShipsAllSetFx() {
         setCurrentPlayerFx(playerOne);
         playerOne.shipsSetUp();
@@ -125,7 +122,6 @@ public class GameProcessor {
             }
         }
     }
-
     public boolean singleRoundProcessorFx(Stage primaryStage, Player playerOne, Player playerTwo) {
         if (continueGame) {
             singleTurnProcessorFx(primaryStage, currentPlayer, waitingPlayer);
@@ -139,9 +135,7 @@ public class GameProcessor {
         }
         return true;
     }
-
     public boolean singleTurnProcessorFx(Stage primaryStage, Player attacker, Player defender) {
-
         System.out.println("processing turn for player " + attacker.getName());
         if (continueGame) {
             if (PlayerSettings.getCurrentPlayerSettings() == 0) {
@@ -160,7 +154,6 @@ public class GameProcessor {
             return false;
         }
     }
-
     public void singleShotProcessor(Player attacker, Player defender) {
         Printer printer = new Printer();
         Validator validator = new Validator();
@@ -186,7 +179,6 @@ public class GameProcessor {
         }
         printer.hostileBoardDrawer(attacker, defender);
     }
-
     public void singleShotProcessorFx(Player attacker, Player defender, String target) {
         Printer printer = new Printer();
         Validator validator = new Validator();
@@ -194,7 +186,6 @@ public class GameProcessor {
         printer.hostileBoardDrawer(attacker, defender);
 
         if (validator.validateIsTargetOnBoard(target, board)) {
-
             attacker.addShot(target);
 
             for (Ship ship : defender.getShips()) {
@@ -233,11 +224,7 @@ public class GameProcessor {
     }
     public void processGameFX(Stage primaryStage) {
         Drawer drawer = new Drawer();
-        try {
-            drawer.drawScene(primaryStage, drawer.drawMenu(menu,primaryStage));
-        } catch (Exception e) {
-
-        }
+        drawer.drawScene(primaryStage, drawer.drawMenu(menu,primaryStage));
     }
     public Player getPlayerOne() {
         return playerOne;

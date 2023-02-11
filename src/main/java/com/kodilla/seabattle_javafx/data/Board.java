@@ -7,8 +7,8 @@ import java.util.Set;
 
 public class Board {
 
-    private static int rowsCount = 10;
-    private static int columnsCount = 10;
+    private static int rowsCount = 12;
+    private static int columnsCount = 12;
     private  List<String> rows = new ArrayList<>();
     private  List<String> columns = new ArrayList<>();
 

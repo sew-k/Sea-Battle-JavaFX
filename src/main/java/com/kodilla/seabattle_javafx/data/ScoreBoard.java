@@ -6,7 +6,6 @@ import java.util.Map;
 public class ScoreBoard {
     private static Map<String,Integer> scoreMap;
     static {
-
         //temporarily values
         scoreMap = new HashMap<>();
         scoreMap.put("Aaaa", 2);
@@ -14,8 +13,6 @@ public class ScoreBoard {
         scoreMap.put("Cccc", 10);
         scoreMap.put("Dddd", 1);
     }
-
-
     public static void addScore(String playerName, int wins) {
         if (scoreMap.containsKey(playerName)) {
             int oldScore = scoreMap.get(playerName);

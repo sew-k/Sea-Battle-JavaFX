@@ -12,27 +12,20 @@ public class PlayerTurnOptions extends Options {
     private final String optionsTitle = "Player turn options";
     private final List<String> options = new ArrayList<>(Arrays.asList("Shot","List of shots","Status of my ships",
             "Show my game board","Show hostile game board", "Exit battle"));
-
     @Override
     public List<String> getOptions() {
         return options;
     }
-
     @Override
     public String getOptionsTitle() {
         return optionsTitle;
     }
-
-
     public boolean singleRoundSelectOption(Player currentPlayer, Player hostilePlayer, GameProcessor processor) {
-
         super.selectOption();
         Keyboard keyboard = new Keyboard();
         Validator validator = new Validator();
         Printer printer = new Printer();
-
         boolean end = false;
-
         while (!end) {
             printer.whoseTurnInformation(currentPlayer);
             printer.optionsPrinter(this);

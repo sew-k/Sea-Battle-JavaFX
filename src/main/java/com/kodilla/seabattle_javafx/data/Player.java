@@ -14,39 +14,19 @@ public abstract class Player {
     private Ship currentShip;
     private boolean allShipsSet;
 
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null) return false;
-//
-//        Player player = (Player) o;
-//
-//        return name.equals(player.name);
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return Objects.hash(name);
-//    }
-
     public boolean isAllShipsSet() {
         return allShipsSet;
     }
-
     public void setAllShipsSet(boolean allShipsSet) {
         this.allShipsSet = allShipsSet;
     }
-
     private Map<Integer,Integer> shipsToSet;
-
     public Map<Integer, Integer> getShipsToSet() {
         return shipsToSet;
     }
-
     public Set<String> getAvailableFieldsOnBoard() {
         return availableFieldsOnBoard;
     }
-
     public Set<String> getAvailableFieldsForShipSetUp(Ship ship) {
         Board board = new Board();
 
@@ -117,7 +97,6 @@ public abstract class Player {
             return null;
         } else return null;
     }
-
     public Set<String> checkAvailableFieldsOnPlayerBoard() {
         Board board = new Board();
         Set<String> fields = board.getAllFieldsOnBoard();
@@ -132,52 +111,40 @@ public abstract class Player {
         }
         return fields;
     }
-
     public String getName() {
         return name;
     }
-
     public void addShot(String shot) {
         this.shots.add(shot);
     }
-
     public Set<String> getShots() {
         return shots;
     }
-
     public void setName(String name) {
         this.name = name;
     }
-
     public List<Ship> getShips() {
         return ships;
     }
-
     public void setShips(List<Ship> ships) {
         this.ships = ships;
     }
-
     public String selectTarget() {
         //temporarily
         return null;
     }
-
     public void addShip(Ship ship) {
         this.ships.add(ship);
     }
-
     public int getScore() {
         return score;
     }
-
     public void setScore(int score) {
         this.score = score;
     }
-
     public void shipsSetUp() {
     }
     public void shipsSetUpFx(Stage primaryStage) {
-
     }
     public boolean tryFieldForShipSetUp(String field, Ship ship) {
         return true;
@@ -185,22 +152,15 @@ public abstract class Player {
     public boolean tryFieldForShipSetUp(Stage stage, String field, Ship ship) {
         return true;
     }
-
     public boolean tryFieldForShipsSetUp(String temporaryField) {
         return true;
     }
-
     public boolean askForAllShipsSetUp(Stage primaryStage) {
         return allShipsSet;
-
     }
-
     public void setCurrentShip(int currentShipSize) {
-
     }
-
     public Ship getCurrentShip() {
         return currentShip;
     }
-
 }

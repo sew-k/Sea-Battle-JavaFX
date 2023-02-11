@@ -15,33 +15,27 @@ public class Settings extends Options {
     private static Map<Integer,Integer> shipCountSettings;
     static {
         shipCountSettings = new HashMap<>();
-        shipCountSettings.put(4,0);
-        shipCountSettings.put(3,0);
-        shipCountSettings.put(2,1);
-        shipCountSettings.put(1,1);
+        shipCountSettings.put(4,1);
+        shipCountSettings.put(3,2);
+        shipCountSettings.put(2,3);
+        shipCountSettings.put(1,4);
     }
-
     private static boolean onePlayerGame = true;
-    private static boolean cheatMode = true;         //TODO temporarily
+    private static boolean cheatMode = false;
     private String keyForChangeSettings = "y";
     private String keyForLeaveSettings = "n";
-
     public static boolean isCheatMode() {
         return cheatMode;
     }
-
     public static void setCheatMode(boolean cheatMode) {
         Settings.cheatMode = cheatMode;
     }
-
     public String getKeyForChangeSettings() {
         return keyForChangeSettings;
     }
-
     public String getKeyForLeaveSettings() {
         return keyForLeaveSettings;
     }
-
     public void setDefaultShipCountSettings() {
         //temporarily - default values
         shipCountSettings.put(4,1);
@@ -49,14 +43,6 @@ public class Settings extends Options {
         shipCountSettings.put(2,3);
         shipCountSettings.put(1,4);
     }
-    public void setDefaultShipCountSettingsForTest() {
-        //temporarily - default values
-        shipCountSettings.put(4,0);
-        shipCountSettings.put(3,0);
-        shipCountSettings.put(2,0);
-        shipCountSettings.put(1,1);
-    }
-
     @Override
     public List<String> getOptions() {
         return options;
@@ -65,11 +51,9 @@ public class Settings extends Options {
     public String getOptionsTitle() {
         return optionsTitle;
     }
-
     public static Map<Integer, Integer> getShipCountSettings() {
         return shipCountSettings;
     }
-
     public static void setShipCountSettingsFromInteger(int shipSize) {
         Keyboard keyboard = new Keyboard();
         Printer printer = new Printer();
@@ -77,20 +61,9 @@ public class Settings extends Options {
         int key = keyboard.getInt();
         shipCountSettings.replace(shipSize,key);
     }
-
     public static void setShipCountSettings(Map<Integer, Integer> shipCountSettings) {
         Settings.shipCountSettings = shipCountSettings;
     }
-
-    public static boolean isOnePlayerGame() {
-        return onePlayerGame;
-    }
-
-    public static void setOnePlayerGame(boolean onePlayerGame) {
-        Settings.onePlayerGame = onePlayerGame;
-    }
-
-
     public boolean changeSettingsOrLeave(String key) {
         boolean result = false;
         if (key.equals(getKeyForChangeSettings())) {
@@ -102,31 +75,7 @@ public class Settings extends Options {
     }
     @Override
     public void selectOptionFx(Button button, Stage primaryStage) {
-        Drawer drawer = new Drawer();
-        GameProcessor gameProcessor = new GameProcessor();
-        Settings settings = new Settings();
-        Menu menu = new Menu();
 
-        if (button.getText().equals(this.options.get(0))) {
-            //gameProcessor.startGameFx();
-
-        } else if (button.getText().equals(this.options.get(1))) {
-            try {
-                drawer.drawMenu(settings, primaryStage);
-            } catch (Exception e) {
-
-            }
-
-        } else if (button.getText().equals(this.options.get(2))) {
-            //drawer.drawScoreBoard();
-            //processor.processGame();
-        } else if (button.getText().equals(this.options.get(3))) {
-            try {
-                drawer.drawMenu(menu, primaryStage);
-            } catch (Exception e) {
-
-            }
-        }
     }
 
     @Override
@@ -236,7 +185,7 @@ public class Settings extends Options {
                     }
 
                 } else if (Integer.parseInt(key) == 3) {
-                    //processor.processGame();
+
                 }
                 return;
             } else {

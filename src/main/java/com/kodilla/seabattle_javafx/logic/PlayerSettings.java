@@ -14,8 +14,7 @@ public class PlayerSettings extends Options {
             "Player vs Computer (hard)",             //TODO - implementation of hard-version of ComputerPlayer
             "Player vs Player (hot seat)",
             "Computer vs Computer"));                //TODO - implementation different names or numerators for both Cpu-players
-    private static int currentPlayerSettings = 2;
-
+    private static int currentPlayerSettings = 0;
     @Override
     public String getOptionsTitle() {
         return optionsTitle;
@@ -24,18 +23,14 @@ public class PlayerSettings extends Options {
     public List<String> getOptions() {
         return playerSettings;
     }
-
     public static int getCurrentPlayerSettings() {
         return currentPlayerSettings;
     }
-
     public static void setCurrentPlayerSettings(int currentPlayerSettings) {
         PlayerSettings.currentPlayerSettings = currentPlayerSettings;
     }
-
     @Override
     public void selectOption() {
-
         super.selectOption();
         Keyboard keyboard = new Keyboard();
         Validator validator = new Validator();
@@ -53,5 +48,4 @@ public class PlayerSettings extends Options {
             }
         }
     }
-
 }

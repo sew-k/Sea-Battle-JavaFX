@@ -11,7 +11,6 @@ import java.util.*;
 
 public class HumanPlayer extends Player {
 
-    //private String name;
     private List<Ship> ships = new ArrayList<>();
     private Set<String> shots = new HashSet<>();
     private Set<String> availableFieldsOnBoard = new HashSet<>();
@@ -117,7 +116,6 @@ public class HumanPlayer extends Player {
             drawer.drawPlayerBoardForShipsSetUp(new Stage(), GameProcessor.currentPlayer);
         }
     }
-
     @Override
     public boolean tryFieldForShipSetUp(Stage stage, String temporaryField, Ship ship) {
         System.out.println("trying field: " + temporaryField);
@@ -153,12 +151,10 @@ public class HumanPlayer extends Player {
                         System.out.println("ALL SHIPS SET");
                         setAllShipsSet(true);
                     } else {
-
                         System.out.println("------------------");
                         shipsToSet.entrySet().stream()
                                 .forEach(System.out::println);
                         System.out.println("------------------");
-
                     }
                 }
                 return true;
@@ -167,12 +163,10 @@ public class HumanPlayer extends Player {
                 return false;
             }
         }
-
     @Override
     public void setCurrentShip(int currentShipSize) {
         currentShip = new Ship();
         currentShip.setSize(currentShipSize);
         System.out.println("Chosen current ship size to set: " + currentShip.getSize());
     }
-
 }
