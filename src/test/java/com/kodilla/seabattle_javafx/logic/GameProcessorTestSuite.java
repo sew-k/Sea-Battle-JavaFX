@@ -232,5 +232,57 @@ public class GameProcessorTestSuite {
         //Then
         Assertions.assertTrue(result);
     }
+    @Test
+    void testSingleRoundProcessorIfContinueGameFalse() {
+        //Given
+        GameProcessor.continueGame = false;
+        GameProcessor gameProcessor = new GameProcessor();
+        Stage stage = mock(Stage.class);
+        //Stage stage = new Stage();
+        Player plOne = new HumanPlayer();
+        plOne.setName("One");
+        Player plTwo = new HumanPlayer();
+        plTwo.setName("Two");
+        gameProcessor.setPlayerOne(plOne);
+        gameProcessor.setPlayerTwo(plTwo);
+
+        //When
+        boolean result = gameProcessor.singleRoundProcessorFx(stage, plOne, plTwo);
+
+        //Then
+        Assertions.assertFalse(result);
+    }
+    @Test
+    void testSingleRoundProcessorIfContinueGameTrue() {
+        //Given
+        GameProcessor.continueGame = true;
+        PlayerSettings.setCurrentPlayerSettings(2);
+
+        //Drawer drawer = mock(Drawer.class);
+        Drawer drawer = new Drawer();
+
+        //GameProcessor gameProcessor = spy(new GameProcessor(drawer));
+        GameProcessor gameProcessor = spy(GameProcessor.class);
+        //GameProcessor gameProcessor = new GameProcessor();
+
+        Stage stage = mock(Stage.class);
+        //Stage stage = new Stage();
+
+        Player plOne = new HumanPlayer();
+        plOne.setName("One");
+        Player plTwo = new HumanPlayer();
+        plTwo.setName("Two");
+        gameProcessor.setPlayerOne(plOne);
+        gameProcessor.setPlayerTwo(plTwo);
+        gameProcessor.setCurrentPlayerFx(plOne);
+        when(gameProcessor.singleTurnProcessorFx(stage, plOne, plTwo)).thenReturn(true);
+        when(gameProcessor.singleTurnProcessorFx(stage, plTwo, plOne)).thenReturn(true);
+
+        //When
+        boolean result = gameProcessor.singleRoundProcessorFx(stage, plOne, plTwo);
+
+        //Then
+        Assertions.assertTrue(result);
+    }
 
 }
